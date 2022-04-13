@@ -1,0 +1,3 @@
+<template>
+    setting page
+</template>
