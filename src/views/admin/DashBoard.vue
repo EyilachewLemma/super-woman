@@ -1,22 +1,26 @@
 <template>
     <div class="d-flex justify-content-between mt-3 px-3 w-100">
         <div class="squerecardblue border rounded text-center">
-            <p class="mt-4">1000</p>
+            <div class="mt-3">Total Users</div>
+            <p>{{users.total_users}}</p>
         </div>
         <div class="squerecardgreen border rounded text-center">
-            <p class="mt-4">1000</p>
+            <div class="mt-3">Total Mentors</div>
+            <p>{{users.mentors}}</p>
         </div>
         <div class="squerecardyelow border rounded text-center">
-            <p class="mt-4">1000</p>
+            <div class="mt-3">Total Role Models</div>
+            <p>{{users.role_models}}</p>
         </div>
         <div class="squerecardred border rounded text-center">
-            <p class="mt-4">1000</p>
+            <div class="mt-3">Total Blogs</div>
+            <p>{{users.blogs}}</p>
         </div>
     </div>
     <div class="border rounded shadow-sm m-3 bg-white pb-1">
     <div class="d-flex justify-content-between mt-2 mb-2 ms-5 me-5">
         <div>Recent Registered users</div>
-        <div><a href="#">SEE ALL</a></div>
+        <div><router-link :to="{name:'UserPage'}">SEE ALL</router-link></div>
     </div>
   <table class="listofusers mt-2">
   <thead class="headers">
@@ -28,32 +32,62 @@
       <th class="text-white p-2">Education Level</th>
       <th class="text-white p-2">Joined Date</th>
       <th class="text-white p-2">State</th>
-      <th class="text-white p-2">Action</th>
+      <!-- <th class="text-white p-2">Action</th> -->
       </tr>
       </thead>
   <tbody>
-  <tr v-for="(coc,index) in 6" :key="coc.id">
+  <tr v-for="(user,index) in users.users" :key="user.id">
   <td class="py-2">{{index+1}}</td>
-  <td class="py-2">Shiferaw Muluye</td>
-  <td class="py-2">0912343456</td>
-  <td class="py-2">Addis Ababa</td>
-  <td class="py-2">Phd</td>
-  <td class="py-2">09/03/2021</td>
-  <td class="py-2">Unblocked</td>
-  <td>
+  <td class="py-2">{{user.first_name+' '+user.last_name}}</td>
+  <td class="py-2">{{user.phone_no}}</td>
+  <td class="py-2">{{user.city}}</td>
+  <td class="py-2">{{user.education_level_id}}</td>
+  <td class="py-2">{{user.created_at}}</td>
+  <td class="py-2">{{isActive(user.is_active)}}</td>
+  <!-- <td>
       <div class="d-flex">
           <div class="me-3 icons fs-4"><i class="fas fa-eye"></i></div>
           <div class="me-2 icons fs-4"><i class="fas fa-ban"></i></div>
         </div>
-  </td>
+  </td> -->
   </tr>
   </tbody>
     </table>
     </div>
 </template>
 <script>
+import apiClient from '../../components/baseurl/index.js'
 export default {
-    
+    data() {
+        return {
+            users:{}
+        }
+    },
+    created() {
+        this.fetchRecentRegisterdUsers()
+    },
+    methods: {
+       async fetchRecentRegisterdUsers(){
+           this.$store.commit('setIsItemLoading',true)
+            try{
+                var response = await apiClient.get('api/dashboard')
+                if(response.status === 200){
+            this.users = response.data
+        }
+            }
+            finally{
+                this.$store.commit('setIsItemLoading',false)
+            }
+        },
+        isActive(value){
+              if(Number(value) === 1){
+                  return 'Active'
+              }
+              else{
+                  return 'Blocked'
+              }
+        }
+    },
 }
 </script>
 <style scoped>

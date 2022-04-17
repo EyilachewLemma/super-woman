@@ -2,7 +2,7 @@
  <div @click="$router.back()" class="ms-3 mt-3 fs-4"><i class="fas fa-chevron-left back-chevron"></i></div>
 <div class="d-flex justify-content-between mt-3">
   <div class="ms-3"><strong>Post Blog</strong></div>
-  <button class="savebtn btn py-1 me-3">Save</button>
+ <base-button title="Save" :isLoading="isLoading" @baseButton="saveBlogPost()"></base-button>
 </div>
 <base-card>
 <div class="formContainer">
@@ -12,27 +12,34 @@
     <span class="error-msg mt-1">{{ v$.blogTitle.$errors[0]?.$message}}</span>
   </div>
   <div class="mt-2" :class="{warning:v$.blogTags.$error}">
-    <label for="tags">Blog Tags</label>
+    <label for="tags">Enter Blog Tags separet by comma</label>
     <input type="text" class="form-control" id="tags" v-model="blogTags">
     <span class="error-msg mt-1">{{ v$.blogTags.$errors[0]?.$message}}</span>
+  </div>
+    <div class="mb-3 mt-2" :class="{warning:v$.fields.$error}">
+  <label for="interestedin">Select Field of the Blog</label>
+  <select class="form-select" size="3" multiple v-model="fields" id="interestedin">
+  <option v-for="field in blogfields" :key="field.id" :value="field.id">{{field.title}}</option>
+</select>
+ <span class="error-msg mt-1">{{ v$.fields.$errors[0]?.$message}}</span>
   </div>
    <div class="mt-2" :class="{warning:v$.timeToRead.$error}">
     <label for="timetakestoread">Time Take to Read</label>
     <input type="text" class="form-control" id="timetakestoread" v-model="timeToRead">
     <span class="error-msg mt-1">{{ v$.timeToRead.$errors[0]?.$message}}</span>
   </div>
-   <div class="mt-2" :class="{warning:v$.postedDate.$error}">
-    <label for="posteddate">Posted Date</label>
-    <input type="text" class="form-control" id="posteddate" v-model="postedDate">
-    <span class="error-msg mt-1">{{ v$.postedDate.$errors[0]?.$message}}</span>
-  </div>
   <!-- ckeditor -->
-<div class="ckeditor mt-2 pt-2" :class="{warning:v$.BlogDetail.$error}">
-  <file-editor @editorContent="sendToParent($event)"></file-editor>
-   <span class="error-msg mt-1">{{ v$.BlogDetail.$errors[0]?.$message}}</span>
+<div class="ckeditor mt-2 pt-2" :class="{warning:v$.blogDetail.$error}">
+  <file-editor content="Click here to write the content" @editorContent="acceptEditorData($event)"></file-editor>
+   <span class="error-msg mt-1">{{ v$.blogDetail.$errors[0]?.$message}}</span>
 </div>
+</div>
+
+</base-card>
 <!-- image preview -->
- <image-preview title="Blog's Images" @selected-images="imageSelected($event)"></image-preview>
+<base-card>
+<div class="formContainer">
+ <image-preview title="Blog" picture="" @selectedImages="imageSelected($event)"></image-preview>
  
  </div>
 </base-card>
@@ -43,6 +50,7 @@ import useValidate from '@vuelidate/core'
 import { required,helpers} from '@vuelidate/validators'
 import FileEditor from '../../components/FileEditor'
 import ImagePreview from '../../components/ImagePreview'
+import fileApiClient from '../../components/baseurl/multipart.js'
 export default {
  components:{
    FileEditor,
@@ -53,10 +61,11 @@ export default {
             v$:useValidate(),
             blogTitle:'',
             blogTags:'',
-            BlogDetail:'',
+            blogDetail:'',
+            fields:[],
             selectedImages: [],
-            postedDate:'',
-            timeToRead:''
+            timeToRead:'',
+            isLoading:false
                                     
         }
     },
@@ -64,37 +73,57 @@ export default {
         return{
             blogTitle:{required:helpers.withMessage('title can not be empty',required)},
             blogTags:{required:helpers.withMessage('blog title can not be empty',required)},
-            BlogDetail:{required:helpers.withMessage('blog detail can not be empty',required)},
+            blogDetail:{required:helpers.withMessage('blog detail can not be empty',required)},
              timeToRead:{required:helpers.withMessage('time take  can not be empty',required)},
-              postedDate:{required:helpers.withMessage('posted date can not be empty',required)},
+            fields:{required:helpers.withMessage('please select fields',required)},
         }
     },
+     computed:{
+      blogfields(){
+        return this.$store.getters['admin/fields']
+      }
+    },
     methods: {
-        savePost(){
-            this.v$.$validate()
-               const blogTags = this.tags.split(',')
-            var formData = new FormData()
-            this.selectedImages.forEach((image,i) =>{
-                formData.append(`blog_images[${i}]`,image)
-            })
-             blogTags.forEach((tag,i) =>{
-                formData.append(`blog_tags[${i}]`,tag)
-            })
-            formData.append('role_model-title',this.blogTitle)
-            formData.append('time_take',this.timeToRead)
-            formData.append('posted_date',this.postedDate)
-            formData.append('blog_detail',this.blogDetail)
-            for (var key of formData.entries()) {
-        console.log('key = ',key);
-    }
-        },
-         sendToParent(data){
-            this.BlogDetail = data
-            console.log('content -----',data)
+        acceptEditorData(data){
+            this.blogDetail = data
+            console.log('editor content',this.blogDetail)
         },
         imageSelected(images){
           this.selectedImages = images
-        }
+        },
+       async saveBlogPost(){
+         this.isLoading = true
+            this.v$.$validate()
+               const blogTags = this.blogTags.split(',')
+            var formData = new FormData()
+            this.selectedImages.forEach((image,i) =>{
+                formData.append(`images[${i}]`,image)
+            })
+             blogTags.forEach((tag,i) =>{
+                formData.append(`tags[${i}]`,tag)
+            })
+             this.fields.forEach((field,i) =>{
+                formData.append(`interests[${i}]`+i,field)
+            })
+            formData.append('title',this.blogTitle)
+            formData.append('time_take_to_read',this.timeToRead)
+            // formData.append('posted_date',this.postedDate)
+            formData.append('content',this.blogDetail)
+            for (var key of formData.entries()) {
+        console.log('key = ',key);
+        console.log('blog content ====',this.blogDetail)
+    }
+       try {
+            var response = await fileApiClient.post('api/blogs',formData)
+            if(response.status === 200){
+              console.log('successfuly saved')
+            }
+          }
+          finally{
+            this.isLoading = false
+          }
+        },
+       
          },
 }
 </script>
@@ -191,5 +220,10 @@ label {
           width: 80%;
           margin: auto;
       }
+  }
+  @media(max-width: 992px) {
+     .ckeditor{
+  width: 75vw;
+}
   }
 </style>

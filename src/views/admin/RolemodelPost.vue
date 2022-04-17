@@ -2,7 +2,7 @@
  <div @click="$router.back()" class="ms-3 mt-3 fs-4"><i class="fas fa-chevron-left back-chevron"></i></div>
   <div class="d-flex justify-content-between mt-3">
   <div class="ms-3">Post Role Model</div>
-  <base-button title="Save" :isLoading="false" @baseButton="savePost()"></base-button>
+  <base-button title="Save" :isLoading="isLoading" @baseButton="savePost()"></base-button>
   <!-- <button @click="sendPost()" class="savebtn btn py-1 me-3">Save</button> -->
 </div>
 <base-card>
@@ -16,29 +16,23 @@
     <input type="text" class="form-control" id="tags" v-model="tags">
   </div>
    <div class="mb-3">
-  <label for="interestedin">Role Model's Interests</label>
+  <label for="interestedin">Role Model's Field</label>
   <select class="form-select" size="3" multiple v-model="interests" id="interestedin">
-  <option :value="1">Software Engineer</option>
-   <option :value="2">Mechanical Engineer</option>
-    <option :value="3">Chemical Engineer</option>
+  <option v-for="field in fields" :key="field.id" :value="field.id">{{field.title}}</option>
 </select>
   </div>
   <div class="mb-3">
     <label for="timeToRead">Time it takes to Read</label>
     <input type="text" class="form-control" id="timeToRead" v-model="timeToRead">
   </div>
-  <div class="mb-3">
-    <label for="postedDate">Posted Date</label>
-    <input type="date" class="form-control" id="postedDate" v-model="postedDate">
-  </div>
 </div>
 </base-card>
 <base-card>
 <div class="formContainer">
   <div class="ckeditor mt-2 mb-3">
-  <file-editor @editorContent="sendToParent($event)"></file-editor>
+  <file-editor content="Clic here to write the content" @editorContent="sendToParent($event)"></file-editor>
 </div>
-<image-preview title="Role Model's Image" @selectedImages="imageSelected($event)"></image-preview>
+<image-preview title="Role Model" @selectedImages="imageSelected($event)"></image-preview>
 
 </div>
 </base-card>
@@ -60,11 +54,18 @@ export default {
             interests:[],
             timeToRead:'',
             postedDate:'',
-            selectedImages:[]
+            selectedImages:[],
+            isLoading:false
         }
+    },
+    computed:{
+      fields(){
+        return this.$store.getters['admin/fields']
+      }
     },
      methods: {
         async savePost(){
+          this.isLoading = true
             const roleModelTags = this.tags.split(',')
             var formData = new FormData()
             this.selectedImages.forEach((image,i) =>{
@@ -90,7 +91,7 @@ export default {
             }
           }
           finally{
-            console.log('')
+            this.isLoading = false
           }
         },
         sendToParent(data){

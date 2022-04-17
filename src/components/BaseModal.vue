@@ -1,9 +1,9 @@
 <template>
-<div class="modal  fade" :id="id" tabindex="-1" data-bs-backdrop="static" aria-labelledby="degreeDepartmentLabel" aria-hidden="true">
-  <div class="modal-dialog  modal-dialog-scrollable">
+<div class="modal fade" :id="id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-body">
-         <slot name="modalBody"/>
+       <div class="modal-body">
+           <slot name="modalBody"/>
       </div>
           <div class="d-flex  pb-4">
           <button :disabled="isLoading" type="button" @click="cancel" class="btn  mx-3 btn-cancel border border-secondary ms-auto"  data-bs-dismiss="modal">CANCEL</button>
@@ -22,8 +22,8 @@
             <span v-else>EDIT</span>   
           </button>      
       </div>
-    </div>
   </div>
+</div>
 </div>
 </template>
 <script>
@@ -49,11 +49,11 @@ export default {
 </script>
 <style scoped>  
 .btn-save{
-    background-color: #2f4587;
+    background-color: #eb9713;
     border-radius: 0;
 }
 .btn-save:hover{
-  background-color: #425fb8;
+  background-color: #f4480a;
 }
 .btn-cancel{
   border-radius: 0;  

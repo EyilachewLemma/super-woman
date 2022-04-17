@@ -18,6 +18,13 @@
         </div>
         <div class="routerview flex-fill">
             <router-view></router-view>
+                    <div class="container-fluid content">
+            <div v-if="isItemLoading" class="loading-screen route-loading p-0  position-fixed top-0 start-0 bottom-0 end-0 w-100 h-100 bg-white">
+               <div class="loading-spinner text-center mt-5">
+                   <img src="../assets/spinner.gif"   alt="slow connection">
+               </div>
+            </div>   
+        </div>
         </div>
     </div>
 </template>
@@ -34,6 +41,14 @@ data() {
        isMyAccount:false 
     }
 },
+created() {
+     this.$store.dispatch('admin/fetchFields')
+},
+computed:{
+    isItemLoading(){
+        return this.$store.getters.isItemLoading
+    }
+},
 methods: {
     showAccount(){
         this.isMyAccount = !this.isMyAccount
@@ -43,6 +58,9 @@ methods: {
 }
 </script>
 <style scoped>
+.btn-primary{
+    margin-left: 50%;
+}
 .main-container{
     background-color: #f5f6fa;
 }
@@ -52,7 +70,7 @@ methods: {
     position: absolute;
     top: 60px;
     right: 1%;
-    z-index: 1000;
+    z-index: 10;
 }
 .accBtn{
     border: none;
@@ -63,13 +81,16 @@ methods: {
     min-height: 100vh;
     position: absolute;
     top: 0;
-    bottom: 0;
+    bottom: 0; 
     background-color: #ecf1fe;
 }
 .routerview{
-    z-index: 1;
+    /* z-index: 1; */
     margin-left: 17%;
     background-color: #f5f6fa;
     min-height: 100vh;
+}
+.loading-spinner{
+    background-color: #fff;
 }
 </style>

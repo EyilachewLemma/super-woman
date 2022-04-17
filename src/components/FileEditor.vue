@@ -1,5 +1,6 @@
 <template>
    <ckeditor :editor="editor" @ready="onReady" v-model="editorData" :config="editorConfig" @blur="onEditorBlur"></ckeditor>
+   <span>{{mainContent}}</span>
 </template>
 <script>
 import DocumentEditor from '@ckeditor/ckeditor5-build-decoupled-document';
@@ -34,7 +35,7 @@ class MyUploadAdapter {
         // integration to choose the right communication channel. This example uses
         // a POST request with JSON as a data structure but your configuration
         // could be different.
-        xhr.open( 'POST', 'http://192.168.137.239:8000/api/content_image', true );
+        xhr.open( 'POST', 'http://10.161.179.66:8000/api/content_image', true );
         // xhr.setRequestHeader('x-csrf-token','{{csrf-token()}}');
         xhr.responseType = 'json';
     }
@@ -106,6 +107,7 @@ function MyCustomUploadAdapterPlugin( editor ) {
     };
 }
 export default {
+  props:['content'],
   emits:{
     editorContent(){
       return true
@@ -114,7 +116,7 @@ export default {
     data() {
   return {
     editor: DocumentEditor,
-    editorData: '<p>Click here to write the detail.</p>',
+    editorData:'<p>Clic here to write the content</>',
     editorConfig: {
         extraPlugins:[MyCustomUploadAdapterPlugin],
       toolbar: {
@@ -171,6 +173,11 @@ export default {
       licenseKey: ''
     }
 }
+    },
+    watch:{
+      content(newValue){
+        this.editorData = newValue
+      }
     },
    methods: {
   onReady( editor )  {

@@ -1,18 +1,21 @@
 import { createStore } from 'vuex'
+import admin from './admin'
 
 export default createStore({
-    modules: {},
+    modules: {
+        admin,
+    },
     state: {
-        isLoading: null,
+        isItemLoading: null,
     },
     getters: {
-        isLoading(state) {
-            return state.isLoading
+        isItemLoading(state) {
+            return state.isItemLoading
         },
     },
     mutations: {
-        setIsLoading(state, isLoading) {
-            state.isLoading = isLoading
+        setIsItemLoading(state, isItemLoading) {
+            state.isItemLoading = isItemLoading
         },
     },
     actions: {

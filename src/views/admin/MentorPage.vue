@@ -1,19 +1,29 @@
 <template>
 <div class="row">
-   <div class="border rounded shadow-sm ms-4 mt-3 me-3 px-0 bg-white col-md-7">
+   <div class="border rounded shadow-sm ms-4 mt-3 me-3 px-0 bg-white col-lg-7">
        <div class="d-flex justify-content-between px-3 pt-4">
-    <div class="input-group search">
-     <input type="text" class="form-control p-1" placeholder="Search Mentor" aria-label="search" aria-describedby="addon-wrapping">
+    <div class="input-group search align-self-start mt-4">
+     <input type="text" class="form-control" placeholder="Search Mentor" aria-label="search" aria-describedby="addon-wrapping" v-model="search.searchBy" @keyup.enter="searchByStudId()">
      <span @click="searchByStudId()" class="searchicon  input-group-text" id="searchby_id"><i class="fas fa-search"></i></span>
 </div>
-<div>
-    <span><i class="fas fa-sort-amount-up-alt"></i></span> <u>Filter Mentor</u>
-</div>
-<div>
-    <span><i class="fas fa-filter"></i></span> <u>Sort Mentor</u>
-</div>
+<div class="mb-3">
+  <label for="interestedin">Filter Mentors By</label>
+  <select class="form-select" v-model="search.filterBy" id="interestedin" @change="filterMentors($event)">
+      <option :value="''">All</option>
+  <option v-for="field in fields" :key="field.id" :value="field.id">{{field.title}}</option>
+</select>
+  </div>
+ <div class="mb-3">
+  <label for="interestedin">Sort Mentors By</label>
+  <select class="form-select" id="interestedin" v-model="sortMentor" @change="sortMentor($event,sortingMenors)">
+  <option value="view">More Viewed</option>
+   <option value="like">Most Liked</option>
+    <option value="share">Most Shared</option>
+      <option value="day">Date Added</option>
+</select>
+  </div>
     </div>
-    <div class="text-center mt-1 mb-3">38 results</div>
+    <div class="text-center mt-1 mb-3">{{searchResults}}</div>
     <hr />
     <div v-for="n in 10" :key="n" class="mentor-list">
       <div class="px-3 profil-img d-flex align-items-center">
@@ -24,15 +34,15 @@
               <div class="small">10 Followers</div>
           </div>
           <div class="ms-auto d-flex">
-              <button class="btn me-3 viewBtn profileBtn">View Profile</button>
-              <button class="btn blockBtn profileBtn">Block</button>
+              <button @click="viewProfile()" class="btn me-3 viewBtn profileBtn">View Profile</button>
+              <button @click="blockMentor()" class="btn blockBtn profileBtn">Block</button>
           </div>
       </div>
       <hr>
     </div>
 
    </div>
-   <div class="border rounded shadow-sm ms-1 mt-3 me-2 px-0 bg-white col-md-4">
+   <div class="border rounded shadow-sm ms-1 mt-3 me-2 px-0 bg-white col-lg-4">
        <p class="p-3">mentor request</p>
        <hr>
         <div v-for="n in 10" :key="n" class="mentor-list">
@@ -43,8 +53,8 @@
               <div class="small">UX Designer, Amazon</div>
           </div>
           <div class="d-flex">
-              <button class="btn me-2 viewRequestBtn mentorRequestBtn small p-1">View request</button>
-              <button class="btn confirmBtn mentorRequestBtn small p-1">Confirm</button>
+              <button @click="viewRequest()" class="btn me-2 viewRequestBtn mentorRequestBtn small p-1">View request</button>
+              <button @click="confirmRequest()" class="btn confirmBtn mentorRequestBtn small p-1">Confirm</button>
           </div>
       </div>
       <hr>
@@ -52,6 +62,92 @@
    </div>
 </div>
 </template>
+<script>
+import apiClient from '../../components/baseurl/index.js'
+export default {
+    data() {
+        return {
+            mentors:{},
+            sortingMenors:[],
+            sortMentor:'',
+            searchResults:'',
+            search:{
+                filterBy:'',
+                page:1,
+                searchBy:''
+            }
+        }
+    },
+     computed:{
+        fields(){
+            return this.$store.getters['admin/fields']
+        }
+        },
+    methods: {
+         async fetchMentors(search){
+              this.$store.commit('setIsItemLoading',true)
+             try{
+        var response = await apiClient.get(`api/mentors?page=${search.page}&search=${search.searchBy}&filter=${search.filterBy}&per_page=${search.per_page}`)
+        if(response.status === 200){
+            this.mentors = response.data
+            this.searchResults = this.mentors.data?.length+ ' results found'
+            this.sortingBlogs = response.data.data
+        }
+             }
+             finally{
+                  this.$store.commit('setIsItemLoading',false)
+             }
+        },
+        viewProfile(){},
+        blockMentor(){},
+        viewRequest(){},
+        confirmRequest(){},
+        filterMentors(event){
+            this.search.filterBy = event.target.value
+            this.fetchMentors(this.search)
+        },
+        sortMentorsBy(event,mentors){
+              var value = event.target.value
+           if(value === 'view'){
+               this.sortMentorsByViews(mentors)
+           }
+           else if(value === 'like'){
+               this.sortMentorsByLikes(mentors)
+           }
+            else if(value === 'share'){
+               this.sortMentorsByshares(mentors)
+           }
+            else if(value === 'comment'){
+               this.sortMentorsByComments(mentors)
+           }
+            else if(value === 'day'){
+               this.sortMentorsByDate(mentors)
+           }
+           console.log('sorted mentors',this.mentors)
+        },
+          sortMentorsByViews(mentors){
+              this.mentors.data = mentors.sort((obj1, obj2)=>{
+               return new Date(obj2.view) - new Date(obj1.view)})
+        },
+        sortMentorsByLikes(mentors){
+               this.mentors.data = mentors.sort((obj1, obj2)=>{
+               return new Date(obj2.like) - new Date(obj1.like)})
+        },
+        sortMentorsByshares(mentors){
+               this.mentors.data = mentors.sort((obj1, obj2)=>{
+               return new Date(obj2.share) - new Date(obj1.share)})
+        },
+        sortMentorsByComments(mentors){
+               this.mentors.data = mentors.sort((obj1, obj2)=>{
+               return new Date(obj2.comment) - new Date(obj1.comment)})
+        },
+        sortMentorsByDate(mentors){
+           this.mentors.data = mentors.sort((obj1, obj2)=>{
+               return new Date(obj2.created_at) - new Date(obj1.created_at)})
+        },
+    },
+}
+</script>
 <style scoped>
 .searchicon{
   cursor: pointer;

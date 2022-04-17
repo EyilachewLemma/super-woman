@@ -1,6 +1,6 @@
 <template>
     <div class="baseBtn">
-         <button @click="emitEvent()" :disabled="isLoading" type="button" class="btn btn-save text-white mx-3 px-2">
+         <button @click="emitEvent()" :disabled="isLoading" type="button" class="btn mx-3 px-2">
             <span v-if="isLoading">
                <span  class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                  {{title+'ing'}}
@@ -27,7 +27,7 @@ export default {
 <style scoped>
 .btn{
     width: 7em;
-    background-color: #e7453a;
+    background-color: #eb9713;
     color: #fff;
 }
 .btn:hover{

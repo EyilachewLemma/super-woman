@@ -13,7 +13,7 @@ export default {
   box-sizing: border-box;
   }
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'mulish', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; 
 }

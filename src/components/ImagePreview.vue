@@ -1,7 +1,7 @@
 <template>
     <div>
        <input class="image-input p-0 m-0" type="file" name="imageInpute" id="imageInpute" ref="imageHolder" accept="image/.*" multiple @change="fileHandler($event)">
-        <div class="px-3 mb-1">{{title}}</div>
+        <div class="px-3 mb-1">{{title}} Images</div>
     <div class="imageContainer p-2 text-center " :class="{active:isActive}" @dragenter.prevent="activatClass()" @dragleave="activatClass()" @dragover.prevent="" @drop.prevent="fileHandler($event)">
         <label for="imageInpute">
             <div class="fs-2 uploadIcon"><i class="fas fa-upload"></i></div>
@@ -30,7 +30,7 @@ export default {
   },
     data() {
         return {
-            imageFiles: [],
+            imageFiles:[],
             isActive: false,
         }
     },
@@ -43,12 +43,12 @@ export default {
         this.imageFiles.push(selectedFiles[i]);
       }
       this.applyImage();
-      this.$emit('selected-images',this.imageFiles)
+      this.$emit('selectedImages',this.imageFiles)
     },
     removeImage(image, index) {
       this.imageFiles.splice(index, 1);
       this.applyImage();
-      this.$emit('selected-images',this.imageFiles)
+      this.$emit('selectedImages',this.imageFiles)
         },
     applyImage() {
       for (let i = 0; i < this.imageFiles.length; i++) {
@@ -82,7 +82,7 @@ label {
 }
 .btnSelect {
   border: 1px solid gray;
-   background-color: #e7453a;
+   background-color: #e7773a;
   color: #fff;
 }
 .btnSelect:hover {
@@ -104,7 +104,7 @@ label {
   overflow-x: auto;
 }
 .image-box {
-  width: 15%;
+  width: 18%;
   height: 20vh;
   position: relative;
   overflow: hidden;

@@ -2,92 +2,87 @@
     <div class="d-flex justify-content-between mt-3 px-3 w-100">
         <div class="squerecardgreen border rounded text-center">
             <div class="mt-3">Total Views</div>
-            <p class="p-0">1000</p>
+            <p class="p-0">{{summeryDatas.views}}</p>
         </div>
         <div class="squerecardyelow border rounded text-center">
             <div class="mt-3">Total Likes</div>
-            <p>1000</p>
+            <p>{{summeryDatas.likes}}</p>
         </div>
         <div class="squerecardred border rounded text-center">
             <div class="mt-3">Total Shares</div>
-            <p>1000</p>
+            <p>{{summeryDatas.shares}}</p>
         </div>
         <div class="squerecardblue border rounded text-center">
             <div class="mt-3">Total Comments</div>
-            <p>1000</p>
+            <p>{{summeryDatas.comments}}</p>
         </div>
     </div>
     <base-card>
     <div class="d-flex justify-content-between">
     <div class="input-group search w-25 mt-4 align-self-start">
-     <input type="text" class="form-control" placeholder="Search Role Model" aria-label="search" aria-describedby="addon-wrapping">
-     <span @click="searchByStudId()" class="searchicon  input-group-text" id="searchby_id"><i class="fas fa-search"></i></span>
+     <input type="text" class="form-control" placeholder="Search Role Model" aria-label="search" aria-describedby="addon-wrapping" v-model="search.searchBy" @keyup.enter="searchRoleModel()">
+     <span @click="searchRoleModel()" class="searchicon  input-group-text" id="searchby_id"><i class="fas fa-search"></i></span>
 </div>
  <div class="mb-3">
   <label for="interestedin">Filter Role Model</label>
-  <select class="form-select" v-model="filterRoleModel" id="interestedin">
-      <option value="all">All</option>
-  <option value="Software Engineer">Software Engineer</option>
-   <option value="Mechanical Engineer">Mechanical Engineer</option>
-    <option value="Chemical Engineer">Chemical Engineer</option>
+  <select class="form-select" v-model="search.filterBy" id="interestedin" @change="filterRoleModel($event)">
+      <option :value="''">All</option>
+  <option v-for="field in fields" :key="field.id" :value="field.id">{{field.title}}</option>
 </select>
   </div>
-<!-- <div>
-    <span><i class="fas fa-sort-amount-up-alt"></i></span> <u>Filter Role Model</u>
-</div> -->
  <div class="mb-3">
-  <label for="interestedin">Sort Role Model</label>
-  <select class="form-select" v-model="sortRoleModel" id="interestedin">
-  <option value="Software Engineer">More View</option>
-   <option value="Mechanical Engineer">Most Liked</option>
-    <option value="Chemical Engineer">Most Shared</option>
-      <option value="Chemical Engineer">Date Added</option>
-        <option value="Chemical Engineer">More Follower</option>
+  <label for="interestedin">Sort Role Model By</label>
+  <select class="form-select" id="interestedin" v-model="sortRoleModelBy" @change="sortRolModel($event,sortingRoleModels)">
+  <option value="view">More Viewed</option>
+   <option value="like">Most Liked</option>
+    <option value="share">Most Shared</option>
+      <option value="day">Date Added</option>
 </select>
   </div>
-<!-- <div>
-    <span><i class="fas fa-filter"></i></span> <u>Sort Role Model</u>
-</div> -->
 <button @click="postNewRoleModel()" class="btn addpostbtn  mt-4 align-self-start">Post new Role Model</button>
     </div>
-    <div class="text-center mt-2">38 results</div>
-     <div class="cardcontainer mt-3">
+    <div class="text-center mt-2">{{resultsFound}}</div>
+            <!-- dynamic data -->
+             <div class="cardcontainer mt-3">
         <div class="row">
-        <div v-for="n in 6" :key="n" class="col-md-6 col-lg-4 mt-3 rounded">
+        <div v-for="roleModel in roleModels.data" :key="roleModel.id" class="col-md-6 col-lg-4 mt-3 rounded">
           <div class="card">
             <div class="card-img">
- <router-link :to="{name:'RoleModelDetail',params:{roleModelId:1}}"> <img src="../../assets/sayat.jpg" class="card-img-top img-fluid rounded" alt="image1"></router-link>
+ <router-link :to="{name:'RoleModelDetail',params:{roleModelId:roleModel.id}}">
+      <img :src="roleModel.image?.path" class="card-img-top img-fluid rounded" alt="role model image"></router-link>
               </div>
               <div class="w-100 reviews d-flex justify-content-between py-3 px-1">
-    <div class="view me-3"><i class="fas fa-eye"></i> 1000</div>
-    <div class="likes me-3"><i class="fas fa-thumbs-up"></i> 0</div>
-    <div class="comments me-3"><i class="fas fa-comment-alt"></i> 0</div>
-    <div class="shars me-3"><i class="fas fa-share"></i> 0</div>
-    <div class="verification text-danger">Unverified</div>
+    <div class="view me-3"><i class="fas fa-eye"></i> {{roleModel.view}}</div>
+    <div class="likes me-3"><i class="fas fa-thumbs-up"></i> {{roleModel.like}}</div>
+    <div class="comments me-3"><i class="fas fa-comment-alt"></i> {{roleModel.comment}}</div>
+    <div class="shars me-3"><i class="fas fa-share"></i> {{roleModel.share}}</div>
+    <div class="verification" :class="{verified:Number(roleModel.is_verified === 1)}">{{isVerified(roleModel.is_verified)}}</div>
   </div>
 </div>
 </div>
         </div>
             </div>
-            <!-- dynamic data -->
-            <!-- <div class="cardcontainer mt-3">
-        <div class="row">
-        <div v-for="roleModel in roleModels" :key="roleModel.id" class="col-md-6 col-lg-4 mt-3 rounded">
-          <div class="card">
-            <div class="card-img">
- <router-link :to="{name:'RoleModelDetail'}"> <img :src="roleModel.src" class="card-img-top img-fluid rounded" alt="roleModel1"></router-link>
-              </div>
-              <div class="w-100 reviews d-flex justify-content-between py-3 px-1">
-    <div class="view me-3"><i class="fas fa-eye"></i> {{roleModel.views}}</div>
-    <div class="likes me-3"><i class="fas fa-thumbs-up"></i> {{roleModel.likes}}</div>
-    <div class="comments me-3"><i class="fas fa-comment-alt"></i> {{roleModel.comments}}</div>
-    <div class="shars me-3"><i class="fas fa-share"></i> {{roleModel.shares}}</div>
-    <div class="verification text-danger">{{roleModel.isVerified}}</div>
-  </div>
+    <div v-if="roleModels.data?.length" class="d-flex justify-content-end mt-3 me-5">
+<div class="rowsperpage me-3">
+   Role Models per Page
 </div>
+<div class="limit col-sm-1 me-3">
+<select class="form-select form-select-sm" aria-label=".form-select-sm example" v-model="search.per_page" @change="changePerPageValue($event)">
+  <option value="5">5</option>
+  <option value="10">10</option>
+  <option value="15">15</option>
+  <option value="20">20</option>
+  
+</select>
 </div>
-        </div>
-            </div> -->
+<div class="pageno me-3">
+{{roleModels.meta?.from+'-'+roleModels.meta?.to+' of '+roleModels.meta?.total+' Role Models'}}
+</div>
+<div class="leftchivron ms-3 me-3">
+<button @click="backChivron()" class="chivronbtn" :class="{active:roleModels.meta.from !== 1}" :disabled="roleModels.meta.from === 1"><i class="fas fa-chevron-left"></i></button>
+</div>
+<div class="rightchivron"><button @click="forWardChivron()" class="chivronbtn" :class="{active:roleModels.meta.to !==roleModels.meta.total}" :disabled="roleModels.meta.to ===roleModels.meta.total"><i class="fas fa-chevron-right"></i></button></div>
+</div>
     </base-card>
 </template>
 <script>
@@ -96,24 +91,129 @@ export default {
     data(){
         return{
             roleModels:{},
-            filterRoleModel:'',
-            sortRoleModel:'',
+            summeryDatas:{},
+             sortRoleModelBy:'',
+             resultsFound:'',
+             sortingRoleModels:[],
+            search:{
+                searchBy:'',
+                filterBy:'',
+                page:1,
+                per_page:10
+            },
+            
         }
     },
     created() {
-        // this.fetchRoleModels()
+        this.fetchRoleModels(this.search)
+        this.fetchSummaryData()
+    },
+    computed:{
+        fields(){
+            return this.$store.getters['admin/fields']
+        }
     },
     methods: {
         postNewRoleModel(){
            this.$router.push({name:'NewRoleModel'}) 
         },
-        async fetchRoleModels(){
-        var response = await apiClient.get('api/role_models')
+        async fetchRoleModels(search){
+         this.$store.commit('setIsItemLoading',true)
+            try{
+        var response = await apiClient.get(`api/role_models?page=${search.page}&search=${search.searchBy}&filter=${search.filterBy}&per_page=${search.per_page}`)
         if(response.status === 200){
             this.roleModels = response.data
+            this.resultsFound = this.roleModels.data?.length+' Results'
+            this.sortingRoleModels = response.data.data
         }
+         }
+            finally{
+                 this.$store.commit('setIsItemLoading',false)
+            }
+        },
+        async fetchSummaryData(){
+            this.$store.commit('setIsItemLoading',true)
+            try{
+             var response = await apiClient.get('api/summary')
+        if(response.status === 200){
+            this.summeryDatas = response.data
         }
-    },
+            }
+            finally{
+                  this.$store.commit('setIsItemLoading',false)
+            }
+        },
+        isVerified(value){
+            if(Number(value) === 1){
+                return 'Verified'
+            }
+            else{
+                return 'Unverified'
+            }
+        },
+        searchRoleModel(){
+         this.fetchRoleModels(this.search)
+        //  this.resultsFound = this.roleModels.data?.length+' Results'
+        },
+        filterRoleModel(event){
+            this.search.filterBy = event.target.value
+            this.fetchRoleModels(this.search)
+            // this.resultsFound = this.roleModels.data?.length +' Results'
+        },
+        sortRolModel(event,roleModelArray){
+            var value = event.target.value
+           if(value === 'view'){
+               this.sortRolModelByViews(roleModelArray)
+           }
+           else if(value === 'like'){
+               this.sortRolModelByLikes(roleModelArray)
+           }
+            else if(value === 'share'){
+               this.sortRolModelByshares(roleModelArray)
+           }
+            else if(value === 'comment'){
+               this.sortRolModelByComments(roleModelArray)
+           }
+            else if(value === 'day'){
+               this.sortRolModelByDate(roleModelArray)
+           }
+        //    this.resultsFound = this.roleModels.data?.length+' Results'
+           console.log('sorted role-models',this.roleModels)
+        },
+        changePerPageValue(event){
+            this.search.per_page = event.target.value
+            this.fetchRoleModels(this.search)
+        },
+        backChivron(){
+            this.search.page = this.search.page - 1
+            this.fetchRoleModels(this.search)
+        },
+        forWardChivron(){
+            this.search.page = this.search.page +1
+            this.fetchRoleModels(this.search)
+        },
+        sortRolModelByViews(rolmodeles){
+              this.roleModels.data = rolmodeles.sort((obj1, obj2)=>{
+               return new Date(obj2.view) - new Date(obj1.view)})
+        },
+        sortRolModelByLikes(rolmodeles){
+               this.roleModels.data = rolmodeles.sort((obj1, obj2)=>{
+               return new Date(obj2.like) - new Date(obj1.like)})
+        },
+        sortRolModelByshares(rolmodeles){
+               this.roleModels.data = rolmodeles.sort((obj1, obj2)=>{
+               return new Date(obj2.share) - new Date(obj1.share)})
+        },
+        sortRolModelByComments(rolmodeles){
+               this.roleModels.data = rolmodeles.sort((obj1, obj2)=>{
+               return new Date(obj2.comment) - new Date(obj1.comment)})
+        },
+        sortRolModelByDate(rolmodeles){
+           this.roleModels.data = rolmodeles.sort((obj1, obj2)=>{
+               return new Date(obj2.created_at) - new Date(obj1.created_at)})
+        },
+    }
+
 }
 </script>
 <style scoped>
@@ -194,5 +294,19 @@ color: rgb(128, 128, 236);
 .reviews{
   background-color: #12141c;
   color: #fff;
+}
+.verification{
+    color: #d32a1e;
+}
+.verified{
+    color: green;
+}
+.chivronbtn{
+    border: none;
+    background-color: #fff;
+    color: rgba(97, 94, 94, 0.849);
+}
+.active{
+  color: rgb(15, 15, 15);
 }
 </style>

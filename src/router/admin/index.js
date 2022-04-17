@@ -78,5 +78,19 @@ export default {
             component: () =>
                 import ( /* webpackChunkName: "PostBlog" */ '../../views/admin/PostBlog.vue'),
         },
+        {
+            path: '/edit-role-model/:entity/:roleModelId',
+            name: 'EditRoleModel',
+            props: true,
+            component: () =>
+                import ( /* webpackChunkName: "EditRoleModel" */ '../../views/admin/EditingPage.vue'),
+        },
+        {
+            path: '/edit-blog/:entity/:blogId',
+            name: 'EditBlog',
+            props: true,
+            component: () =>
+                import ( /* webpackChunkName: "EditBlog" */ '../../views/admin/EditingPage.vue'),
+        },
     ]
 }

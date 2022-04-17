@@ -7,7 +7,11 @@ import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import BaseCard from './components/BaseCard.vue'
 import BaseButton from './components/BaseButton.vue'
+import BaseModal from './components/BaseModal.vue'
+import DeleteModal from './components/DeleteDialog.vue'
 const app = createApp(App)
 app.component('BaseCard', BaseCard)
+app.component('BaseModal', BaseModal)
 app.component('BaseButton', BaseButton)
+app.component('DeleteModal', DeleteModal)
 app.use(store).use(router).use(CKEditor).mount('#app')
