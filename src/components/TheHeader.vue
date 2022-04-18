@@ -27,16 +27,6 @@
 </nav>
 </template>
 <script>
-import {onMounted,ref} from 'vue'
-import Echo from 'laravel-echo'
-window.Pusher = require('pusher-js');
-window.Echo = new Echo({
-  broadcaster: 'pusher',
-  key: '51df02a0da376c37ab66',
-  cluster: 'ap2', 
-  forceTLS: true
- 
-});
 export default {
   emits:{
     accSetting(){
@@ -45,16 +35,6 @@ export default {
     logout(){
       return true
     }
-  },
-   setup () {
-    onMounted(()=>{
-      window.Echo.listen('AdminNotification',(data)=>{
-        console.log(data);
-        this.notifications.value = data
-      })
-    })
-    const notifications = ref(null)
-    return {notifications}
   },
    methods: {
      accountSetting(){

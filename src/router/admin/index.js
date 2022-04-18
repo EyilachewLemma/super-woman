@@ -3,7 +3,7 @@ export default {
     name: 'AdminHome',
     component: () =>
         import ( /* webpackChunkName: "AdminHome" */ '../../views/AdminHome.vue'),
-    meta: { AdminAuth: true, typeRequired: 'admin' },
+    meta: { adminAuth: true, typeRequired: 'admin' },
     children: [{
             path: '/dash-board',
             name: 'DashBoard',
@@ -92,5 +92,6 @@ export default {
             component: () =>
                 import ( /* webpackChunkName: "EditBlog" */ '../../views/admin/EditingPage.vue'),
         },
+      
     ]
 }

@@ -1,4 +1,5 @@
-import apiClient from '../../components/baseurl/index.js'
+// import apiClient from '../../components/baseurl/index.js'
+import apiClient from '../../components/baseurl'
 export default {
     namespaced: true,
     state() {

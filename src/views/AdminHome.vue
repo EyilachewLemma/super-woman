@@ -31,6 +31,8 @@
 <script>
 import TheHeader from '../components/TheHeader.vue'
 import SideBar from '../components/SideBar.vue'
+import apiClient from '../components/baseurl/index.js'
+
 export default {
 components:{
     TheHeader,
@@ -41,6 +43,19 @@ data() {
        isMyAccount:false 
     }
 },
+  beforeCreate() {
+    if (localStorage.getItem("tokenB")) {
+      let token = localStorage.getItem("tokenB");
+      this.$store.commit("setToken", token);
+      this.$store.commit("setIsAuthenticated", true);
+      apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
+    if (localStorage.getItem("user")) {
+      let user = localStorage.getItem("user");
+      console.log("user", user);
+      this.$store.commit("setUser", JSON.parse(user));
+    }
+  },
 created() {
      this.$store.dispatch('admin/fetchFields')
 },
