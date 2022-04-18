@@ -1,7 +1,7 @@
 <template>
  
       <div class="border rounded shadow-sm m-3 bg-white pb-1">
-           <div class="d-flex px-3 pt-4">
+           <div class="d-flex px-3 pt-4 justify-content-between">
                <div class="input-group search w-25 mt-4 align-self-start me-5">
      <input type="text" class="form-control" placeholder="Search User" aria-label="search" aria-describedby="addon-wrapping" v-model="search.searchBy" @keyup.enter="searchUsers()">
      <span @click="searchUsers()" class="searchicon  input-group-text" id="searchby_id"><i class="fas fa-search"></i></span>
@@ -13,7 +13,7 @@
   <option v-for="field in fields" :key="field.id" :value="field.id">{{field.title}}</option>
 </select>
   </div>
- <div class="mb-3">
+ <!-- <div class="mb-3">
   <label for="interestedin">Sort Users By</label>
   <select class="form-select" id="interestedin" v-model="sortUsersBy" @change="sortUsers($event)">
   <option value="Software Engineer">More View</option>
@@ -22,7 +22,7 @@
       <option value="Chemical Engineer">Date Added</option>
         <option value="Chemical Engineer">More Follower</option>
 </select>
-  </div>
+  </div> -->
   </div>
   <table class="listofusers mt-4">
   <thead class="headers">
@@ -167,7 +167,6 @@ export default {
      searchUsers(){
     this.fetchUsers(this.search)
   },
-  sortUsers(){},
   viewUserDetail(id){
 this.users.data.forEach(user=>{
   if(user.id === id){

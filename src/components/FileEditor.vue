@@ -158,7 +158,7 @@ export default {
       image: {
         toolbar: [
           'imageTextAlternative',
-        //   'imageStyle:full',
+          'imageStyle:full',
           'imageStyle:side',
         //   'linkImage'
         ]

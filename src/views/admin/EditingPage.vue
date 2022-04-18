@@ -23,7 +23,7 @@
   </div>
   <div class="mb-3">
     <label for="timeToRead">Time it takes to Read</label>
-    <input type="text" class="form-control" id="timeToRead" v-model="timeToRead">
+    <input type="number" class="form-control" id="timeToRead" v-model="timeToRead">
   </div>
     <div class="ckeditor mt-3 mb-3">
   <file-editor :content="content" @editorContent="sendToParent($event)"></file-editor>
@@ -36,9 +36,9 @@
 <!-- image display -->
 <base-card v-if="imageFiles?.length">
 <div class="row">
-  <div v-for="image in imageFiles" :key="image.id" class="col-sm-6 col-md-4 col-lg-3 mt-3 imageWraper position-relative">
+  <div v-for="(image,index) in imageFiles" :key="image.id" class="col-sm-6 col-md-4 col-lg-3 mt-3 imageWraper position-relative">
     <img :src="image.path" class="img-fluid" alt="">
-     <button type="button" class="removebtn fs-4 px-1" @click="removeImage(image.id)"><i class="fas fa-times"></i></button>
+     <button type="button" class="removebtn fs-4 px-1" @click="removeImage(index,image.id)"><i class="fas fa-times"></i></button>
   </div>
 </div>
 </base-card>
@@ -52,12 +52,18 @@
 
 </div>
 </base-card>
+<delete-modal id="deleteModal" :isSuccess="isSucceessfull" :isOKRequired="false">
+      <template #modalBody>
+         <div>{{modalTitle}} </div>
+      </template>
+    </delete-modal>
 </template>
 <script>
 import FileEditor from '../../components/FileEditor.vue'
 import ImagePreview from '../../components/ImagePreview.vue'
 import fileApiClient from '../../components/baseurl/multipart.js'
 import apiClient from '../../components/baseurl/index.js'
+import {Modal} from 'bootstrap'
 export default {
     components:{
       FileEditor,
@@ -74,6 +80,8 @@ export default {
             selectedImages:[],
             isLoading:false,
             imageFiles:[],
+            isSucceessfull:false,
+            modalTitle:''
         }
     },
     created() {
@@ -84,6 +92,9 @@ export default {
         this.fetchRoleModelData()
       }
     },
+       mounted() {
+     this.deletemodal = new Modal(document.getElementById('deleteModal'))
+   },
      computed:{
       roleModelFields(){
         return this.$store.getters['admin/fields']
@@ -112,10 +123,7 @@ export default {
              this.tags = tagList.toString()
              this.fields = fieldList
             this.title = response.data.title
-            this.timeToRead = response.data.time_take_to_read
-          
-            console.log('content data to be edited',this.content)
-          
+            this.timeToRead = response.data.time_take_to_read          
         }
         },
         async fetchBlogData(){
@@ -159,8 +167,15 @@ export default {
               response = await fileApiClient.put('api/role_models/'+this.roleModelId,detailContents)
             }
             if(response.status === 200){
-              console.log('successfuly uploaded')
+               this.isSucceessfull = true
+              this.modalTitle = `You have Edited Successfully`
+              this.deletemodal.show()
             }
+          }
+          catch(e){
+              this.isSucceessfull = false
+              this.modalTitle = 'Faild to Edit'
+              this.deletemodal.show()
           }
           finally{
             this.isLoading = false
@@ -183,23 +198,34 @@ export default {
               response = await fileApiClient.post('api/update_images/'+this.roleModelId,formData)
             }
             if(response.status === 200){
-              console.log('successfuly uploaded')
-              this.selectedImages.forEach(image=>{
+                this.isSucceessfull = true
+              this.modalTitle = `You have Upload Image Successfully`
+              this.deletemodal.show()
+              response.data.forEach(image=>{
                 this.imageFiles.push(image)
-              })
+                  })
             }
+          }
+          catch(e){
+             this.isSucceessfull = false
+              this.modalTitle = `Faild to Upload Images`
+              this.deletemodal.show()
           }
           finally{
             this.isLoading = false
           }
         },
-        async removeImage(imgId){        
-            var response = await apiClient.delete('api/delete_image/'+imgId)
+        async removeImage(endex,imgId){        
+            var response 
+            if(this.entity === 'Blog'){
+              response = await apiClient.delete('api/delete_blog_image/'+imgId)
+            }
+            else{
+              response = await apiClient.delete('api/delete_image/'+imgId)
+            }
+             
             if(response.status === 200){
-              var index = this.imageFiles.findIndex(image=>{
-                return image.id = imgId
-              })
-              this.imageFiles = this.imageFiles.splice(index,1)
+              this.imageFiles.splice(endex,1)
             }
           
 
@@ -269,7 +295,7 @@ export default {
   }
   @media(max-width: 992px) {
      .ckeditor{
-  width: 50vw;
+  width: 75vw;
 }
   }
 </style>

@@ -7,11 +7,11 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body text-center" :class="{success:isSuccess,faild:!isSuccess}">
-        {{title}}
+        <slot name="modalBody" />
       </div>
       <div class="d-flex justify-content-end mt-4 p-3">
         <button type="button" class="btn close me-4" data-bs-dismiss="modal">Close</button>
-        <button v-if="isOKRequired" type="button" class="btn okBtn">KO</button>
+        <button @click="emitOkEvent()" v-if="isOKRequired" type="button" class="btn okBtn">Yes</button>
       </div>
     </div>
   </div>
@@ -19,7 +19,17 @@
 </template>
 <script>
 export default {
-    props:['id','title','isSuccess','isOKRequired']
+    props:['id','isSuccess','isOKRequired'],
+    emits:{
+      yes(){
+        return true
+      }
+    },
+    methods: {
+      emitOkEvent(){
+        this.$emit('yes')
+      }
+    },
 }
 </script>
 <style scoped>

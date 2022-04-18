@@ -47,8 +47,10 @@
     <div class="writer">Content written by {{roleModelDetails.written_by.first_name+' '+roleModelDetails.written_by.last_name }}</div>
   </div>
     </div>
-    <delete-modal id="deleteModal" :title="modalTitle" :isSuccess="state" :isOKRequired="false">
-
+    <delete-modal id="deleteModal" :isSuccess="state" :isOKRequired="false">
+            <template #modalBody>
+         <div>{{modalTitle}} </div>
+       </template>
     </delete-modal>
 </template>
 <script>

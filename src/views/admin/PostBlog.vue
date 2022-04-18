@@ -25,7 +25,7 @@
   </div>
    <div class="mt-2" :class="{warning:v$.timeToRead.$error}">
     <label for="timetakestoread">Time Take to Read</label>
-    <input type="text" class="form-control" id="timetakestoread" v-model="timeToRead">
+    <input type="number" class="form-control" id="timetakestoread" v-model="timeToRead">
     <span class="error-msg mt-1">{{ v$.timeToRead.$errors[0]?.$message}}</span>
   </div>
   <!-- ckeditor -->
@@ -43,7 +43,11 @@
  
  </div>
 </base-card>
-
+<delete-modal id="deleteModal" :isSuccess="isSucceessfull" :isOKRequired="false">
+      <template #modalBody>
+         <div>{{modalTitle}} </div>
+      </template>
+    </delete-modal>
 </template>
 <script>
 import useValidate from '@vuelidate/core'
@@ -51,6 +55,7 @@ import { required,helpers} from '@vuelidate/validators'
 import FileEditor from '../../components/FileEditor'
 import ImagePreview from '../../components/ImagePreview'
 import fileApiClient from '../../components/baseurl/multipart.js'
+import{Modal} from 'bootstrap'
 export default {
  components:{
    FileEditor,
@@ -65,7 +70,9 @@ export default {
             fields:[],
             selectedImages: [],
             timeToRead:'',
-            isLoading:false
+            isLoading:false,
+            isSucceessfull:false,
+            modalTitle:'',
                                     
         }
     },
@@ -78,6 +85,9 @@ export default {
             fields:{required:helpers.withMessage('please select fields',required)},
         }
     },
+      mounted() {
+     this.deletemodal = new Modal(document.getElementById('deleteModal'))
+   },
      computed:{
       blogfields(){
         return this.$store.getters['admin/fields']
@@ -115,9 +125,16 @@ export default {
     }
        try {
             var response = await fileApiClient.post('api/blogs',formData)
-            if(response.status === 200){
-              console.log('successfuly saved')
+            if(response.status === 201){
+               this.isSucceessfull = true
+              this.modalTitle = 'You have added one Blog Successfully'
+              this.deletemodal.show()
             }
+          }
+          catch(e){
+             this.isSucceessfull = false
+              this.modalTitle = 'Faild to add Blog'
+              this.deletemodal.show()
           }
           finally{
             this.isLoading = false

@@ -6,8 +6,8 @@
            <slot name="modalBody"/>
       </div>
           <div class="d-flex  pb-4">
-          <button :disabled="isLoading" type="button" @click="cancel" class="btn  mx-3 btn-cancel border border-secondary ms-auto"  data-bs-dismiss="modal">CANCEL</button>
-          <button v-if="buttonType==='add'" :disabled="isLoading" type="button" @click="save" class="btn  px-4 btn-save text-white mx-3">
+          <button :disabled="isLoading" type="button" @click="cancel()" class="btn  mx-3 btn-cancel border border-secondary ms-auto"  data-bs-dismiss="modal">CANCEL</button>
+          <button v-if="buttonType==='add'" :disabled="isLoading" type="button" @click="save()" class="btn  px-4 btn-save text-white mx-3">
             <span v-if="isLoading">
                <span  class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                  SAVING

@@ -8,22 +8,18 @@
       <div class="d-flex justify-content-end">
         <button class="notification-icon me-3 position-relative border rounded shadow-sm p-1">
         <div class="bell-size"><i class="far fa-bell"></i></div>
-        <div class="bage-text p-1"><span class="bage-color px-1 rounded-circle">8</span></div>
+        <div class="bage-text p-1"><span class="bage-color px-1 rounded-circle">{{notifications?.length}}</span></div>
       </button>
-      <div class="profil-img border rounded shadow-sm p-1 d-flex align-items-center">
-        <img src="../assets/sayat.jpg" alt="profile picture" class="img-fluid rounded">
-        <div class="ms-1">Sayat Demsie</div>
-        <div class="btn-group">
-  <button type="button" class="downbtn mx-2 fs-4" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
-    <i class="fas fa-chevron-down"></i>
+      <div class="dropdown">
+  <button class="btn profilebtn dropdown-toggle border shadow-sm px-1 py-2" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+     <img src="../assets/sayat.jpg" alt="profile picture" class="img-fluid rounded">Dropdown button
   </button>
-  <ul class="dropdown-menu dropdown-menu-start p-0">
-     <li><span @click="accountSetting()"  class="dropdown-item px-4 py-3">Account Setting</span></li>
+  <ul class="dropdown-menu dropdown-menu-dark p-0" aria-labelledby="dropdownMenuButton2">
+    <li><span @click="accountSetting()"  class="dropdown-item px-4 py-3">Account Setting</span></li>
        <hr class="m-0 p-0">
-       <li><span @click="logout()" class="dropdown-item px-4 py-3">Logout</span></li>
+   <li><span @click="logout()" class="dropdown-item px-4 py-3">Logout</span></li>
   </ul>
 </div>
-      </div>
       </div>
      
     </div>
@@ -31,6 +27,16 @@
 </nav>
 </template>
 <script>
+import {onMounted,ref} from 'vue'
+import Echo from 'laravel-echo'
+window.Pusher = require('pusher-js');
+window.Echo = new Echo({
+  broadcaster: 'pusher',
+  key: '51df02a0da376c37ab66',
+  cluster: 'ap2', 
+  forceTLS: true
+ 
+});
 export default {
   emits:{
     accSetting(){
@@ -39,6 +45,16 @@ export default {
     logout(){
       return true
     }
+  },
+   setup () {
+    onMounted(()=>{
+      window.Echo.listen('AdminNotification',(data)=>{
+        console.log(data);
+        this.notifications.value = data
+      })
+    })
+    const notifications = ref(null)
+    return {notifications}
   },
    methods: {
      accountSetting(){
@@ -71,6 +87,9 @@ export default {
   top: 3%;
   right: 3%;
 }
+.profilebtn{
+   box-shadow: none;
+}
 img{
   width: 20%;
   height: 2.5em;
@@ -78,27 +97,7 @@ img{
  .profileSection{
   min-width: 30%;
   }
-  .accountBtn{
-    box-shadow: none;
-    background:none;
-  }
-  .downChivron{
-    cursor: pointer;
-  }
-  .downChivron:hover{
-    color: #f12112;
-  }
   li:hover{
     cursor: pointer;
-  }
-  .downbtn{
-    box-shadow: none;
-    background: none;
-    border: none;
-  }
-  ul{
-    position: absolute!important;
-    top: 60px;
-    right: 3%;
   }
 </style>

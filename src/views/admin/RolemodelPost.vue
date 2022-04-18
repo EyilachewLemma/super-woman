@@ -23,7 +23,7 @@
   </div>
   <div class="mb-3">
     <label for="timeToRead">Time it takes to Read</label>
-    <input type="text" class="form-control" id="timeToRead" v-model="timeToRead">
+    <input type="number" class="form-control" id="timeToRead" v-model="timeToRead">
   </div>
 </div>
 </base-card>
@@ -36,11 +36,17 @@
 
 </div>
 </base-card>
+<delete-modal id="deleteModal" :isSuccess="isSucceessfull" :isOKRequired="false" @yes="yesDelete()">
+      <template #modalBody>
+         <div>{{modalTitle}} </div>
+      </template>
+    </delete-modal>
 </template>
 <script>
 import FileEditor from '../../components/FileEditor.vue'
 import ImagePreview from '../../components/ImagePreview.vue'
 import fileApiClient from '../../components/baseurl/multipart.js'
+import {Modal} from 'bootstrap'
 export default {
     components:{
       FileEditor,
@@ -55,9 +61,15 @@ export default {
             timeToRead:'',
             postedDate:'',
             selectedImages:[],
-            isLoading:false
+            isLoading:false,
+            isSucceessfull:false,
+            deletemodal:null,
+            modalTitle:''
         }
     },
+     mounted() {
+     this.deletemodal = new Modal(document.getElementById('deleteModal'))
+   },
     computed:{
       fields(){
         return this.$store.getters['admin/fields']
@@ -81,14 +93,21 @@ export default {
             formData.append('time_take_to_read',this.timeToRead)
             // formData.append('posted_date',this.postedDate)
             formData.append('content',this.roleModelDetail)
-            for (var key of formData.entries()) {
-        console.log('key = ',key);
-    }
+    //         for (var key of formData.entries()) {
+    //     console.log('key = ',key);
+    // }
           try {
             var response = await fileApiClient.post('api/role_models',formData)
-            if(response.status === 200){
-              console.log('successfuly saved')
+            if(response.status === 201){
+              this.isSucceessfull = true
+              this.modalTitle = 'You have added one Role Model Successfully'
+              this.deletemodal.show()
             }
+          }
+          catch(e){
+             this.isSucceessfull = false
+              this.modalTitle = 'Faild to add role model'
+              this.deletemodal.show()
           }
           finally{
             this.isLoading = false

@@ -37,7 +37,11 @@
   </div>
     </div>
     
-     <delete-modal id="deleteModal" :title="modalTitle" :isSuccess="state" :isOKRequired="false"></delete-modal>
+     <delete-modal id="deleteModal" :isSuccess="isSuccess" :isOKRequired="false">
+       <template #modalBody>
+         <div>{{modalTitle}} </div>
+       </template>
+     </delete-modal>
 </template>
 <script>
 import {Modal} from 'bootstrap'
