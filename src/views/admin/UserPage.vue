@@ -2,7 +2,7 @@
  
       <div class="border rounded shadow-sm m-3 bg-white pb-1">
            <div class="d-flex px-3 pt-4 justify-content-between">
-               <div class="input-group search w-25 mt-4 align-self-start me-5">
+               <div class="input-group search w-25 mt-4 align-self-start me-5 bordrd rounded">
      <input type="text" class="form-control" placeholder="Search User" aria-label="search" aria-describedby="addon-wrapping" v-model="search.searchBy" @keyup.enter="searchUsers()">
      <span @click="searchUsers()" class="searchicon  input-group-text" id="searchby_id"><i class="fas fa-search"></i></span>
 </div>
@@ -13,18 +13,8 @@
   <option v-for="field in fields" :key="field.id" :value="field.id">{{field.title}}</option>
 </select>
   </div>
- <!-- <div class="mb-3">
-  <label for="interestedin">Sort Users By</label>
-  <select class="form-select" id="interestedin" v-model="sortUsersBy" @change="sortUsers($event)">
-  <option value="Software Engineer">More View</option>
-   <option value="Mechanical Engineer">Most Liked</option>
-    <option value="Chemical Engineer">Most Shared</option>
-      <option value="Chemical Engineer">Date Added</option>
-        <option value="Chemical Engineer">More Follower</option>
-</select>
-  </div> -->
   </div>
-  <table class="listofusers mt-4">
+  <table class="listofusers mt-2">
   <thead class="headers">
       <tr class="table-header">
       <th class="text-white p-2">NO</th>
@@ -217,6 +207,8 @@ this.modalDialog.show()
 }
 .search input:focus{
     box-shadow: none;
+    border-color: #d5d6d9;
+    z-index: 0;
 }
 .search span{
     background-color: #fff;

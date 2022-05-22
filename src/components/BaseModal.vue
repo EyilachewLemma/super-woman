@@ -29,11 +29,7 @@
 <script>
 export default {
   props:['isLoading','id','buttonType'],
-  data() {
-    return {
-      
-    }
-  },
+ 
   methods: {
     save(){
       this.$emit('save')

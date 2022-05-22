@@ -162,6 +162,8 @@ export default {
 }
 .search input:focus{
     box-shadow: none;
+     border-color: #d5d6d9;
+    z-index: 0;
 }
 .search span{
     background-color: #fff;

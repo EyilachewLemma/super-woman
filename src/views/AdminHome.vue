@@ -1,16 +1,11 @@
 <template>
     <div class="shadow-lg position-relative">
-        <the-header @my-account="showAccount()"></the-header>
-         <div v-if="isMyAccount" class="myAccount border rounded shadow-sm">
-             <div>
-                 <button class="accBtn">Account Setting</button>
-             </div>
-             <hr class="w-100" />
-        <div>
-           <button class="accBtn">Logout</button>
+        <the-header @myaccount="showAccount()"></the-header>
+       <transition name="modal">
+          <div  v-if="isMyAccount" class="myAccount">
+            <account-setting @cancelModal="cancelDialog()"></account-setting>
         </div>
-        
-    </div>
+       </transition>
         </div>
     <div class="main-container d-flex position-relative">
         <div class="sidebar border shadow-sm">
@@ -31,10 +26,12 @@
 <script>
 import TheHeader from '../components/TheHeader.vue'
 import SideBar from '../components/SideBar.vue'
+import AccountSetting from './AccountSetting.vue'
 export default {
 components:{
     TheHeader,
-    SideBar
+    SideBar,
+    AccountSetting
 },
 data() {
     return {
@@ -52,9 +49,11 @@ computed:{
 methods: {
     showAccount(){
         this.isMyAccount = !this.isMyAccount
-        console.log(' down arrow is clicked',this.isMyAccount)
+    },
+    cancelDialog(){
+        this.isMyAccount = false
     }
-},
+    },
 }
 </script>
 <style scoped>
@@ -65,8 +64,8 @@ methods: {
     background-color: #f5f6fa;
 }
 .myAccount{
-    width: 15%;
-    background-color: rgb(172, 236, 228);
+    width: 45%;
+    background-color: #fff;
     position: absolute;
     top: 60px;
     right: 1%;
@@ -92,5 +91,30 @@ methods: {
 }
 .loading-spinner{
     background-color: #fff;
+}
+.modal-enter-from{
+  opacity: 0;
+  transform: translateX(30%);
+}
+.modal-enter-active{
+  transition: all .3s ease-out;
+}
+.modal-enter-to{
+  opacity: 1;
+}
+.modal-leave-from{
+  opacity: 1;
+}
+.modal-leave-active{
+  transition: all .3s ease-out;
+}
+.modal-leave-to{
+  opacity: 0;
+  transform: translateX(30%);
+}
+@media(min-width: 992px){
+    .myAccount{
+        width: 30%;
+    }
 }
 </style>

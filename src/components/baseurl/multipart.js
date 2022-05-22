@@ -1,5 +1,5 @@
 import axios from "axios";
-let multiplApiClient = axios.create({
+let imageApi = axios.create({
     baseURL: 'https://admin.super-women.merahitechnologies.com',
     // baseURL: 'http://10.161.179.66:8000',
     headers: {
@@ -8,4 +8,4 @@ let multiplApiClient = axios.create({
     }
 })
 
-export default multiplApiClient
+export default imageApi
