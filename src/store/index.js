@@ -1,9 +1,10 @@
 import { createStore } from 'vuex'
-import admin from './admin'
-
+import admin from './admin/index'
+import auth from './admin/auth'
 export default createStore({
     modules: {
         admin,
+        auth,
     },
     state: {
         isItemLoading: null,

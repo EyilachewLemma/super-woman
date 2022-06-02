@@ -9,7 +9,7 @@
       <div class="position-relative profile_photo">
         <img
           v-if="!image"
-          src="../assets/sayat.jpg"
+          :src="user.profile_picture"
           alt="admin profile picture"
           class="img-fluid radius-circled"
         />
@@ -45,9 +45,6 @@
     </div>
     <transition mode="out-in">
       <div v-if="image" class="d-flex justify-content-between mx-5">
-        <!-- <button class="saveprofile btn" @click="saveProfilePicture()">
-        save profile <picture></picture>
-      </button> -->
         <base-button
           title="Save"
           :isLoading="isProfileSaving"
@@ -108,20 +105,6 @@
           v$.personalInfo.phone_no.$errors[0]?.$message
         }}</span>
       </div>
-      <div class="d-flex" :class="{ warning: v$.personalInfo.city.$error }">
-        <p class="me-3">Location</p>
-        <input
-          type="text"
-          class="nameField form-control rounded-0 ms-auto align-self-start mt-1 px-3"
-          id="location"
-          :readonly="isEditInfo === false"
-          ref="infoInput"
-          v-model="personalInfo.city"
-        />
-        <span class="error-msg mt-1">{{
-          v$.personalInfo.city.$errors[0]?.$message
-        }}</span>
-      </div>
       <transition mode="out-in">
         <div v-if="isNewInfo" class="d-flex justify-content-between mx-5 mt-3">
           <base-button
@@ -135,7 +118,7 @@
         </div>
       </transition>
       <transition mode="out-in">
-        <div v-if="isOldPassword" class="oldPassword">
+        <div v-if="isNewPassword" class="oldPassword">
           <div class="mb-3 mt-3" :class="{ warning: v$.oldPassword.$error }">
             <label for="oldpws" class="form-label">Enter Old Password</label>
             <input
@@ -149,62 +132,47 @@
               v$.oldPassword.$errors[0]?.$message
             }}</span>
           </div>
-          <div class="d-flex justify-content-end">
+          <div class="mb-3 mt-3" :class="{ warning: v$.newPassword.$error }">
+            <label for="newpws" class="form-label">Enter New Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="newpws"
+              ref="newpwd"
+              v-model="newPassword"
+            />
+            <span class="error-msg mt-1">{{
+              v$.newPassword.$errors[0]?.$message
+            }}</span>
+          </div>
+          <div class="mb-3" :class="{ warning: v$.confirmPassword.$error }">
+            <label for="confirmpws" class="form-label"
+              >Confirm New Password</label
+            >
+            <input
+              type="password"
+              class="form-control"
+              id="confirmpws"
+              v-model="confirmPassword"
+            />
+            <span class="error-msg mt-1">{{
+              v$.confirmPassword.$errors[0]?.$message
+            }}</span>
+          </div>
+          <div class="d-flex justify-content-between mx-5 mt-3">
             <base-button
-              title="Submit"
-              :isLoading="isLoading"
-              @baseButton="checkOldPassword('1234')"
+              title="Save"
+              :isLoading="isSavingNewPws"
+              @baseButton="saveNewPassword()"
             ></base-button>
+            <button class="btn cancelprofile" @click="cancelPasswordEditing()">
+              Cancel
+            </button>
           </div>
         </div>
       </transition>
-      <div v-if="isNewPassword" class="newPassword">
-        <div class="mb-3 mt-3" :class="{ warning: v$.newPassword.$error }">
-          <label for="newpws" class="form-label">Enter New Password</label>
-          <input
-            type="password"
-            class="form-control"
-            id="newpws"
-            ref="newpwd"
-            v-model="newPassword"
-          />
-          <span class="error-msg mt-1">{{
-            v$.newPassword.$errors[0]?.$message
-          }}</span>
-        </div>
-        <div class="mb-3" :class="{ warning: v$.confirmPassword.$error }">
-          <label for="confirmpws" class="form-label"
-            >Confirm New Password</label
-          >
-          <input
-            type="password"
-            class="form-control"
-            id="confirmpws"
-            v-model="confirmPassword"
-          />
-          <span class="error-msg mt-1">{{
-            v$.confirmPassword.$errors[0]?.$message
-          }}</span>
-        </div>
-        <div class="d-flex justify-content-end">
-          <base-button
-            title="Save"
-            :isLoading="isSavingNewPws"
-            @baseButton="saveNewPassword()"
-          ></base-button>
-        </div>
-      </div>
     </div>
   </div>
-  <delete-modal
-    id="deleteDialog"
-    :isSuccess="isSucceessfull"
-    :isOKRequired="false"
-  >
-    <template #modalBody>
-      <div>{{ modalTitle }}</div>
-    </template>
-  </delete-modal>
 </template>
 <script>
 import useValidate from "@vuelidate/core";
@@ -215,9 +183,8 @@ import {
   maxLength,
   sameAs,
 } from "@vuelidate/validators";
-import apiClient from "../components/baseurl/index.js";
-import fileApiClient from "../components/baseurl/multipart";
-// import Modal from 'bootstrap'
+import apiClient from "../../components/baseurl/index";
+import axios from "axios";
 export default {
   props: {},
   emits: {
@@ -233,14 +200,8 @@ export default {
       isInfoLoading: false,
       isProfileSaving: false,
       isNewInfo: false,
-      isOldPassword: false,
       isNewPassword: false,
-      personalInfo: {
-        first_name: "Yeshiwas",
-        last_name: "Bekele",
-        phone_no: "0921321234",
-        city: "Bahir Dar",
-      },
+      personalInfo: {},
       oldPassword: "",
       newPassword: "",
       confirmPassword: "",
@@ -278,9 +239,6 @@ export default {
             maxLength(10)
           ),
         },
-        city: {
-          required: helpers.withMessage("location can not be empty", required),
-        },
       },
       oldPassword: {
         required: helpers.withMessage("plsase enter your password", required),
@@ -294,21 +252,34 @@ export default {
       },
     };
   },
-  //   mounted() {
-  //    this.deletemodal = new Modal(document.getElementById('deleteDialog'))
-  //  },
+  computed: {
+    user() {
+      return this.$store.getters.user;
+    },
+  },
+  created() {
+    this.personalInfo.first_name = this.user.first_name;
+    this.personalInfo.last_name = this.user.last_name;
+    this.personalInfo.phone_no = this.user.phone_no;
+  },
+  watch: {
+    user() {
+      this.personalInfo.first_name = this.user.first_name;
+      this.personalInfo.last_name = this.user.last_name;
+      this.personalInfo.phone_no = this.user.phone_no;
+    },
+  },
   methods: {
     editYourInfo() {
       this.isEditInfo = true;
       this.$refs.infoInput.focus();
       this.isNewInfo = true;
       this.isNewPassword = false;
-      this.isOldPassword = false;
+      this.image = false;
     },
     changePassword() {
       this.isNewInfo = false;
-      this.isOldPassword = true;
-      this.$refs.oldpwd.focus();
+      this.isNewPassword = true;
     },
     async saveNewInfo() {
       this.v$.$validate();
@@ -316,55 +287,60 @@ export default {
       if (
         !this.v$.personalInfo.first_name.$error &&
         !this.v$.personalInfo.last_name.$error &&
-        !this.v$.personalInfo.phone_no.$error &&
-        !this.v$.personalInfo.city.$error
+        !this.v$.personalInfo.phone_no.$error
       ) {
         this.isInfoLoading = true;
+        var user = {
+          first_name: this.personalInfo.first_name,
+          last_name: this.personalInfo.last_name,
+          phone_no: this.personalInfo.phone_no,
+        };
         try {
-          response = await apiClient.post("api/edited_info", this.personalInfo);
+          response = await apiClient.put(`api/employees/${this.user.id}`, user);
+          console.log("status code=", response.status);
           if (response.status === 200) {
-            this.isSucceessfull = true;
-            this.modalTitle = `Your have Edited Successfully`;
-            this.deletemodal.show();
             this.isEditInfo = false;
+            var editedUser = {
+              id: this.user.id,
+              first_name: response.data.first_name,
+              last_name: response.data.last_name,
+              phone_no: response.data.phone_no,
+              profile_picture: this.user.profile_picture,
+            };
+            this.$store.commit("setUser", editedUser);
+            this.$toast.success(`successfully edited`);
+            // console.log("edited user ", user);
+            // console.log("response data= ", response.data);
+            this.isNewInfo = false;
           }
         } catch (e) {
-          this.isSucceessfull = false;
-          this.modalTitle = `Faild to Edit`;
-          this.deletemodal.show();
+          this.$toast.error(`Faild to Edit your informaion`);
         } finally {
           this.isInfoLoading = false;
         }
       }
     },
-    checkOldPassword(oldPassword) {
-      this.v$.$validate();
-      if (!this.v$.oldPassword.$error && this.oldPassword === oldPassword) {
-        this.isNewInfo = false;
-        this.isOldPassword = false;
-        this.v$.$reset();
-        this.isNewPassword = true;
-        // this.$refs.newpwd.focus()
-        console.log("password is cheked=");
-      }
-    },
     async saveNewPassword() {
       this.v$.$validate();
-      if (!this.v$.newPassword.$error && !this.v$.confirmPassword.$error) {
+      if (
+        !this.v$.newPassword.$error &&
+        !this.v$.oldPassword.$error &&
+        !this.v$.confirmPassword.$error
+      ) {
         this.isSavingNewPws = true;
+        var password = {
+          new_password: this.newPassword,
+          old_password: this.oldPassword,
+        };
         try {
-          var response = await apiClient.post("api/new_password");
+          var response = await apiClient.post(`api/change_password`, password);
           if (response.status === 200) {
-            this.isSucceessfull = true;
-            this.modalTitle = `Your Pssword is Changed Successfully`;
-            this.deletemodal.show();
-            this.isEditInfo = false;
+            this.$toast.success(`your password is changed`);
+            this.isNewPassword = false;
             this.cancelDialog();
           }
         } catch (e) {
-          this.isSucceessfull = false;
-          this.modalTitle = `Faild to change Password`;
-          this.deletemodal.show();
+          this.$toast.error(`Faild to change your password`);
         } finally {
           this.isSavingNewPws = false;
         }
@@ -373,18 +349,32 @@ export default {
     async saveProfilePicture() {
       this.isProfileSaving = true;
       try {
+        var token = localStorage.getItem("tokenB");
+        console.log("token = ", token);
+        console.log("loged in user= ", this.user);
         var formData = new FormData();
-        formData.append("profile_picture", this.imageFile);
-        var response = await fileApiClient.post(
-          "api/profile_picture",
-          formData
+        formData.append("profile", this.imageFile);
+        var response = await axios.post(
+          `http://10.161.160.238:8000/api/change_profile/${this.user.id}`,
+          formData,
+          {
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "multipart/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
-        if (response.status === 201) {
-          console.log("saved");
+        if (response.status === 200) {
+          // console.log("profile picture saved");
+          this.$store.commit("setUser", response.data);
+          this.$toast.success(`your profile picture changed`);
           this.image = false;
+          // console.log("user = ", this.$store.getters.user);
+          // console.log("user data =", response.data);
         }
       } catch (e) {
-        console.log("faild to save profile picture");
+        this.$toast.error(`Faild to change profile picture`);
       } finally {
         this.isProfileSaving = false;
       }
@@ -394,7 +384,6 @@ export default {
     },
     cancelDialog() {
       this.isNewInfo = false;
-      this.isOldPassword = false;
       this.isNewPassword = false;
       this.isEditInfo = false;
       this.$emit("cancelModal");
@@ -412,13 +401,9 @@ export default {
     cancelInfoEditing() {
       this.isNewInfo = false;
     },
-    // applyImage() {
-    //   let reader = new FileReader();
-    //   reader.onload = () => {
-    //     this.imageFile.src = reader.result;
-    //   };
-    //   reader.readAsDataURL(this.imageFile);
-    // },
+    cancelPasswordEditing() {
+      this.isNewPassword = false;
+    },
   },
 };
 </script>

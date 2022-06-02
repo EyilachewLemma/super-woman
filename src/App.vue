@@ -17,5 +17,12 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; 
 }
-
+.warining input {
+  border: 1px red solid;
+}
+.warining span {
+  display: inline;
+  color: red;
+  font-size: 14px;
+}
 </style>

@@ -9,9 +9,10 @@ import BaseCard from './components/BaseCard.vue'
 import BaseButton from './components/BaseButton.vue'
 import BaseModal from './components/BaseModal.vue'
 import DeleteModal from './components/DeleteDialog.vue'
+import Toaster from "@meforma/vue-toaster";
 const app = createApp(App)
 app.component('BaseCard', BaseCard)
 app.component('BaseModal', BaseModal)
 app.component('BaseButton', BaseButton)
 app.component('DeleteModal', DeleteModal)
-app.use(store).use(router).use(CKEditor).mount('#app')
+app.use(store).use(router).use(CKEditor).use(Toaster, { position: 'top-right' }).mount('#app')
