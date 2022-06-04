@@ -33,7 +33,7 @@
               <dir class="ms-1 me-2 mt-2">
                 {{ user.first_name + " " + user.last_name }}
               </dir>
-              <div class="fs-5 me-2 mt-2">
+              <div class="fs-5 ms-3 me-2 mt-2">
                 <i class="fas fa-chevron-down"></i>
               </div>
             </button>

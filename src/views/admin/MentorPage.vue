@@ -140,18 +140,13 @@
         </div>
         <div class="modal-body">
           <div>
-            <p><strong>First Name: </strong> {{ mentorDetail.first_name }}</p>
-            <p><strong>Last Name: </strong> {{ mentorDetail.last_name }}</p>
-            <p><strong>Phone Number: </strong> {{ mentorDetail.phone_no }}</p>
-            <p><strong>Email Address: </strong> {{ mentorDetail.email }}</p>
-            <p><strong>Location: </strong> {{ mentorDetail.city }}</p>
-            <p>
-              <strong>Date of Birth: </strong> {{ mentorDetail.date_of_birth }}
-            </p>
-            <p>
-              <strong>Education Level: </strong>
-              {{ mentorDetail.education_level }}
-            </p>
+            <p><strong>First Name: </strong> Betelhem</p>
+            <p><strong>Last Name: </strong> Dagne</p>
+            <p><strong>Phone Number: </strong> 0910234545</p>
+            <p><strong>Email Address: </strong> bety@gmail.com</p>
+            <p><strong>Location: </strong> Bahir Dar</p>
+            <p><strong>Date of Birth: </strong> 1995</p>
+            <p><strong>Education Level: </strong> masters Degree</p>
           </div>
         </div>
         <div class="modal-footer">
@@ -196,18 +191,13 @@
         </div>
         <div class="modal-body">
           <div>
-            <p><strong>First Name: </strong> {{ mentorDetail.first_name }}</p>
-            <p><strong>Last Name: </strong> {{ mentorDetail.last_name }}</p>
-            <p><strong>Phone Number: </strong> {{ mentorDetail.phone_no }}</p>
-            <p><strong>Email Address: </strong> {{ mentorDetail.email }}</p>
-            <p><strong>Location: </strong> {{ mentorDetail.city }}</p>
-            <p>
-              <strong>Date of Birth: </strong> {{ mentorDetail.date_of_birth }}
-            </p>
-            <p>
-              <strong>Education Level: </strong>
-              {{ mentorDetail.education_level }}
-            </p>
+            <p><strong>First Name: </strong> Fikirte</p>
+            <p><strong>Last Name: </strong> Libona</p>
+            <p><strong>Phone Number: </strong> 0910234545</p>
+            <p><strong>Email Address: </strong> fikir@gmail.com</p>
+            <p><strong>Location: </strong> Addis Ababa</p>
+            <p><strong>Date of Birth: </strong> 1995</p>
+            <p><strong>Education Level: </strong> masters Degree</p>
           </div>
         </div>
         <div class="modal-footer">
@@ -283,15 +273,15 @@ export default {
         this.mentorApplicants = response.data;
       }
     },
-    viewProfile(mentorId) {
-      this.mentors.forEach((mentor) => {
-        if (mentor.id === mentorId) {
-          this.mentorDetail = mentor;
-          this.viewRequestModal.hide();
-          this.modalDialog.show();
-          return;
-        }
-      });
+    viewProfile() {
+      // this.mentors.forEach((mentor) => {
+      //   if (mentor.id === mentorId) {
+      //     this.mentorDetail = mentor;
+      //     this.viewRequestModal.hide();
+      this.modalDialog.show();
+      //     return;
+      //   }
+      // });
     },
     async blockMentor(mentor) {
       var response = await apiClient.post(`api/block_user/${mentor.id}`, {
@@ -301,9 +291,9 @@ export default {
         mentor.status = "Blocked";
       }
     },
-    async viewRequest(mentor) {
-      this.mentorApplicant = mentor;
-      this.modalDialog.hide();
+    async viewRequest() {
+      // this.mentorApplicant = mentor;
+      // this.modalDialog.hide();
       this.viewRequestModal.show();
     },
     async confirmRequest(mentor) {

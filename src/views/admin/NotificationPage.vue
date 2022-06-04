@@ -31,8 +31,8 @@
     <div>
       <h5 class="text-primary ms-3 mt-3">Mentor Request</h5>
       <div
-        v-for="n in 4"
-        :key="n"
+        v-for="notification in notifications.mentor"
+        :key="notification.id"
         @click="gotoMentorPage()"
         class="d-flex my-3 notificationbox"
       >
@@ -44,16 +44,18 @@
         <div class="ms-3 me-1">
           <p>Abebe Yimer</p>
           <p>Requeste to be a mentor</p>
-          <p class="text-primary">2 hours ago</p>
+          <p class="text-primary">
+            {{ formatingTime(notification.created_at) }}
+          </p>
         </div>
       </div>
     </div>
     <!-- blog notifications -->
     <h5 class="text-primary ms-3 mt-3">Blog Notifications</h5>
     <div
-      v-for="n in 2"
-      :key="n"
-      @click="gotoBlogPage()"
+      v-for="notification in notifications.blog"
+      :key="notification.id"
+      @click="gotoBlogPage(notification.data?.id)"
       class="d-flex my-3 notificationbox"
     >
       <img
@@ -64,15 +66,15 @@
       <div class="ms-3 me-1">
         <p>Maza Mamaru</p>
         <p>New blog is posted</p>
-        <p class="text-primary">1 hours ago</p>
+        <p class="text-primary">{{ formatingTime(notification.created_at) }}</p>
       </div>
     </div>
     <!-- role model notifications -->
     <h5 class="text-primary ms-3 mt-3">Role Model Notifications</h5>
     <div
-      v-for="n in 3"
-      :key="n"
-      @click="gotoRoleModelPage()"
+      v-for="notification in notifications.rolemodel"
+      :key="notification.id"
+      @click="gotoRoleModelPage(notification.data.id)"
       class="d-flex my-3 notificationbox"
     >
       <img
@@ -83,7 +85,7 @@
       <div class="ms-3 me-1">
         <p>Woyinshet Shegaw</p>
         <p>New Role Model is posted</p>
-        <p class="text-primary">3 hours ago</p>
+        <p class="text-primary">{{ formatingTime(notification.created_at) }}</p>
       </div>
     </div>
   </div>
@@ -96,7 +98,7 @@ export default {
     },
   },
   computed: {
-    Notifications() {
+    notifications() {
       return this.$store.getters["admin/notifications"];
     },
   },
@@ -119,6 +121,39 @@ export default {
     markAsRead() {},
     filterUnReadNotification() {},
     allNotification() {},
+    formatingTime(createdAt) {
+      var seconds = Number(new Date(createdAt));
+      var year = Math.floor(seconds / 31536000);
+      var weeks = Math.floor(seconds / 604800);
+      var days = Math.floor(seconds / (3600 * 24));
+      var hours = Math.floor((seconds % (3600 * 24)) / 3600);
+      var minuts = Math.floor((seconds % 3600) / 60);
+      var second = Math.floor(seconds % 60);
+      var yearDisplay =
+        year > 0 ? year + (year == 1 ? " year ago, " : " years ago") : 0;
+      var weekDisplay =
+        weeks > 0 ? weeks + (weeks == 1 ? " week ago, " : " weeks ago") : 0;
+      var dDisplay = days > 0 ? days + (days == 1 ? " day ago, " : " days ago") : 0;
+      var hDisplay =
+        hours > 0 ? hours + (hours == 1 ? " hour ago, " : " hours ago") : 0;
+      var mDisplay =
+        minuts > 0 ? minuts + (minuts == 1 ? " minute ago, " : " minutes ago") : 0;
+      var sDisplay =
+        second > 0 ? second + (second == 1 ? " second ago" : " seconds ago") : 0;
+      if (year > 0) {
+        return yearDisplay;
+      } else if (weeks > 0) {
+        return weekDisplay;
+      } else if (days > 0) {
+        return dDisplay;
+      } else if (hours > 0) {
+        return hDisplay;
+      } else if (minuts > 0) {
+        return mDisplay;
+      } else {
+        return sDisplay;
+      }
+    },
   },
 };
 </script>

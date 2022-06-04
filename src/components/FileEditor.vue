@@ -43,7 +43,7 @@ class MyUploadAdapter {
     // integration to choose the right communication channel. This example uses
     // a POST request with JSON as a data structure but your configuration
     // could be different.
-    xhr.open("POST", "http://10.161.160.238:8000/api/content_image", true);
+    xhr.open("POST", "https://admin.super-women.merahitechnologies.com/api/content_image", true);
     // xhr.setRequestHeader('x-csrf-token','{{csrf-token()}}');
     xhr.responseType = "json";
   }

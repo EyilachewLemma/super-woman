@@ -355,7 +355,7 @@ export default {
         var formData = new FormData();
         formData.append("profile", this.imageFile);
         var response = await axios.post(
-          `http://10.161.160.238:8000/api/change_profile/${this.user.id}`,
+          `https://admin.super-women.merahitechnologies.com/api/change_profile/${this.user.id}`,
           formData,
           {
             headers: {
