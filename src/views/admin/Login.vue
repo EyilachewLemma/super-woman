@@ -207,10 +207,7 @@ export default {
             apiClient.defaults.headers.common[
               "Authorization"
             ] = `Bearer ${response.data.access_token}`;
-            // fileApiClient.defaults.headers.common[
-            //   "Authorization"
-            // ] = `Bearer ${response.data.access_token}`;
-            this.$store.commit("setToken", response.data.access_token);
+           this.$store.commit("setToken", response.data.access_token);
             this.$store.commit("setUser", response.data.user);
             this.$store.commit("setIsAuthenticated", true);
             let user = response.data.user;

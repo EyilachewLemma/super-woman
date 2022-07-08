@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="border rounded shadow-sm ms-4 mt-3 me-3 px-0 bg-white col-lg-7">
+    <div class="border rounded shadow-sm ms-4 mt-3 me-2 px-0 bg-white col-lg-7">
       <div class="d-flex justify-content-between px-3 pt-4">
         <div class="input-group search align-self-start mt-4">
           <input
@@ -62,10 +62,10 @@
             <div class="small">UX Designer, Amazon</div>
             <div class="small">10 Followers</div>
           </div>
-          <div class="ms-auto d-flex">
+          <div class="ms-auto me-2 d-flex">
             <button
               @click="viewProfile(mentor)"
-              class="btn me-3 viewBtn profileBtn"
+              class="btn me-3 viewBtn profileBtn px-1"
             >
               View Profile
             </button>
@@ -80,7 +80,9 @@
         <hr />
       </div>
     </div>
-    <div class="border rounded shadow-sm ms-1 mt-3 me-2 px-0 bg-white col-lg-4">
+    <div
+      class="border rounded shadow-sm mt-3 ms-4 me-2 me-lg-0 px-0 bg-white col-lg-4"
+    >
       <p class="p-3">mentor request</p>
       <hr />
       <div v-for="n in 10" :key="n" class="mentor-list">
@@ -94,16 +96,16 @@
             <strong class="small">Meseret Defar</strong>
             <div class="small">UX Designer, Amazon</div>
           </div>
-          <div class="d-flex">
+          <div class="d-flex ms-auto me-4 me-lg-3">
             <button
               @click="viewRequest()"
-              class="btn me-2 viewRequestBtn mentorRequestBtn small p-1"
+              class="btn me-2 viewRequestBtn mentorRequestBtn small px-1"
             >
               View request
             </button>
             <button
               @click="confirmRequest()"
-              class="btn confirmBtn mentorRequestBtn small p-1"
+              class="btn confirmBtn mentorRequestBtn small"
             >
               Confirm
             </button>
@@ -116,7 +118,7 @@
   <!-- profile dialog -->
   <div
     class="modal fade"
-    id="mentorDetailModal"
+    id="mentorProfileModal"
     tabindex="-1"
     aria-labelledby="exampleModalLabel"
     aria-hidden="true"
@@ -156,7 +158,7 @@
           <button
             @click="blockMentor(mentor)"
             type="button"
-            class="btn blockUser"
+            class="btn blockUser px-3"
           >
             Block
           </button>
@@ -217,7 +219,7 @@
   </div>
 </template>
 <script>
-import Modal from "bootstrap";
+import { Modal } from "bootstrap";
 import apiClient from "../../components/baseurl/index.js";
 export default {
   data() {
@@ -239,7 +241,7 @@ export default {
     };
   },
   mounted() {
-    this.modalDialog = new Modal(document.getElementById("mentorDetailModal"));
+    this.modalDialog = new Modal(document.getElementById("mentorProfileModal"));
     this.viewRequestModal = new Modal(document.getElementById("viewRequest"));
   },
   computed: {
@@ -382,23 +384,28 @@ export default {
   border-radius: 5px;
 }
 .viewBtn {
-  width: 7rem;
+  width: 8rem;
   background-color: #eb9713;
   color: #fff;
 }
-.blockBtn {
-  width: 7rem;
+.blockBtn,
+.closeModal {
+  width: 6rem;
   border: 1px solid #ccced2;
 }
 .profileBtn:hover {
   background-color: #f81b0b;
   color: #fff;
 }
+.blockUser {
+  background-color: #eb9713;
+  color: #fff;
+}
 .newMentorImg img {
-  max-width: 1.5rem;
-  min-width: 1.5rem;
-  max-height: 2em;
-  min-height: 2em;
+  max-width: 2rem;
+  min-width: 2rem;
+  max-height: 2.5em;
+  min-height: 2.5em;
   border-radius: 2px;
 }
 /* .mentorRequestBtn{
@@ -409,6 +416,7 @@ export default {
   color: #fff;
 }
 .viewRequestBtn {
+  width: 7rem;
   border: 1px solid #ccced2;
 }
 .confirmBtn {

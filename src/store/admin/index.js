@@ -7,6 +7,7 @@ export default {
             fields: [],
             writers: [],
             notifications: [],
+            languages: []
         }
     },
     getters: {
@@ -18,6 +19,9 @@ export default {
         },
         notifications(state) {
             return state.notifications
+        },
+        languages(state) {
+            return state.languages
         }
     },
     mutations: {
@@ -29,6 +33,9 @@ export default {
         },
         setNotifications(state, notification) {
             state.notifications = notification
+        },
+        setLanguages(state, lanuage) {
+            state.languages = lanuage
         }
     },
     actions: {
@@ -60,6 +67,13 @@ export default {
             if (response.status === 200) {
                 console.log('notifications come form server', response.data)
                 commit('setNotifications', response.data)
+            }
+        },
+        async fetchLanuages({ commit }) {
+            var response = await apiClient.get(`api/languages`)
+            if (response.status === 200) {
+                console.log('languages', response.data)
+                commit('setLanguages', response.data)
             }
         }
 

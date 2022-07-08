@@ -22,13 +22,13 @@
     </div>
     <div class="routerview flex-fill">
       <router-view></router-view>
-      <div class="container-fluid content">
+      <div class="container-fluid">
         <div
           v-if="isItemLoading"
           class="loading-screen route-loading p-0 position-fixed top-0 start-0 bottom-0 end-0 w-100 h-100 bg-white"
         >
           <div class="loading-spinner text-center mt-5">
-            <img src="../assets/spinner.gif" alt="slow connection" />
+            <img src="../assets/newspinner.gif" alt="slow connection" />
           </div>
         </div>
       </div>
@@ -41,6 +41,7 @@ import SideBar from "../components/SideBar.vue";
 import AccountSetting from "./admin/AccountSetting.vue";
 import NotificationPage from "./admin/NotificationPage.vue";
 import apiClient from "../components/baseurl/index.js";
+import fileApiClient from '../components/baseurl/multipart'
 
 export default {
   components: {
@@ -61,6 +62,7 @@ export default {
       this.$store.commit("setToken", token);
       this.$store.commit("setIsAuthenticated", true);
       apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      fileApiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
     if (localStorage.getItem("user")) {
       let user = localStorage.getItem("user");
@@ -71,10 +73,14 @@ export default {
   created() {
     this.$store.dispatch("admin/fetchFields");
     this.$store.dispatch("admin/fetchNotifications");
+    this.$store.dispatch('admin/fetchLanuages')
   },
   computed: {
     isItemLoading() {
       return this.$store.getters.isItemLoading;
+    },
+    notifications() {
+      return this.$store.getters["admin/notifications"];
     },
   },
   methods: {
@@ -83,8 +89,10 @@ export default {
       this.isNotification = false;
     },
     showNotifications() {
-      this.isNotification = !this.isNotification;
-      this.isMyAccount = false;
+      if (this.notifications?.length) {
+        this.isNotification = !this.isNotification;
+        this.isMyAccount = false;
+      }
     },
     cancelDialog() {
       this.isMyAccount = false;

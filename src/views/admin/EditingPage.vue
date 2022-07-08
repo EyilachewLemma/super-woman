@@ -96,6 +96,7 @@
     id="deleteModal"
     :isSuccess="isSucceessfull"
     :isOKRequired="false"
+    :modalHeader="modalHeader"
   >
     <template #modalBody>
       <div>{{ modalTitle }}</div>
@@ -126,6 +127,7 @@ export default {
       imageFiles: [],
       isSucceessfull: false,
       modalTitle: "",
+      modalHeader:''
     };
   },
   created() {
@@ -211,12 +213,14 @@ export default {
         }
         if (response.status === 200) {
           this.isSucceessfull = true;
-          this.modalTitle = `You have Edited Successfully`;
+          this.modalTitle = `You Have Edited Successfully`;
+          this.modalHeader = 'Successful'
           this.deletemodal.show();
         }
       } catch (e) {
         this.isSucceessfull = false;
-        this.modalTitle = "Faild to Edit";
+        this.modalTitle = "Faild To Edit!, Try Again";
+        this.modalHeader = 'Faild'
         this.deletemodal.show();
       } finally {
         this.isLoading = false;
@@ -244,6 +248,7 @@ export default {
         if (response.status === 200) {
           this.isSucceessfull = true;
           this.modalTitle = `You have Upload Image Successfully`;
+          this.modalHeader = 'Successful '
           this.deletemodal.show();
           response.data.forEach((image) => {
             this.imageFiles.push(image);
@@ -253,6 +258,7 @@ export default {
       } catch (e) {
         this.isSucceessfull = false;
         this.modalTitle = `Faild to Upload Images`;
+        this.modalHeader = 'Faild'
         this.deletemodal.show();
       } finally {
         this.isLoading = false;
@@ -328,6 +334,9 @@ export default {
     width: 80%;
     margin: auto;
   }
+}
+.ckeditor {
+  max-width: 100%;
 }
 @media (max-width: 992px) {
   .ckeditor {

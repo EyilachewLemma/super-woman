@@ -16,7 +16,7 @@
           ></span>
         </button>
         <ul class="dropdown-menu p-0" aria-labelledby="dropdownMenuLink">
-          <li @click="markAsRead()">
+          <li @click="markAllAsRead()">
             <span class="ms-1">Mark all as read</span>
           </li>
           <li @click="filterUnReadNotification()">
@@ -29,11 +29,10 @@
       </div>
     </div>
     <div>
-      <h5 class="text-primary ms-3 mt-3">Mentor Request</h5>
       <div
-        v-for="notification in notifications.mentor"
+        v-for="notification in adminNotificatins"
         :key="notification.id"
-        @click="gotoMentorPage()"
+        @click="viewMessage(notification)"
         class="d-flex my-3 notificationbox"
       >
         <img
@@ -43,19 +42,22 @@
         />
         <div class="ms-3 me-1">
           <p>Abebe Yimer</p>
-          <p>Requeste to be a mentor</p>
-          <p class="text-primary">
+          <p>{{ notification.data.title }}</p>
+          <p :class="{ textprimary: !notification.read_at }">
             {{ formatingTime(notification.created_at) }}
           </p>
         </div>
+        <div v-if="!notification.read_at" class="text-primary ms-auto me-3">
+          Unread
+        </div>
       </div>
     </div>
-    <!-- blog notifications -->
+    <!-- blog notifications
     <h5 class="text-primary ms-3 mt-3">Blog Notifications</h5>
     <div
-      v-for="notification in notifications.blog"
+      v-for="notification in adminNotificatins.blog"
       :key="notification.id"
-      @click="gotoBlogPage(notification.data?.id)"
+      @click="gotoBlogPage(notification.data?.id, notification)"
       class="d-flex my-3 notificationbox"
     >
       <img
@@ -66,15 +68,17 @@
       <div class="ms-3 me-1">
         <p>Maza Mamaru</p>
         <p>New blog is posted</p>
-        <p class="text-primary">{{ formatingTime(notification.created_at) }}</p>
+        <p :class="{ textprimary: !notification.read_at }">
+          {{ formatingTime(notification.created_at) }}
+        </p>
       </div>
-    </div>
+    </div> -->
     <!-- role model notifications -->
-    <h5 class="text-primary ms-3 mt-3">Role Model Notifications</h5>
+    <!-- <h5 class="text-primary ms-3 mt-3">Role Model Notifications</h5>
     <div
-      v-for="notification in notifications.rolemodel"
+      v-for="notification in adminNotificatins.rolemodel"
       :key="notification.id"
-      @click="gotoRoleModelPage(notification.data.id)"
+      @click="gotoRoleModelPage(notification.data.id, notification)"
       class="d-flex my-3 notificationbox"
     >
       <img
@@ -85,62 +89,138 @@
       <div class="ms-3 me-1">
         <p>Woyinshet Shegaw</p>
         <p>New Role Model is posted</p>
-        <p class="text-primary">{{ formatingTime(notification.created_at) }}</p>
+        <p :class="{ textprimary: !notification.read_at }">
+          {{ formatingTime(notification.created_at) }}
+        </p>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 <script>
+import apiClient from "../../components/baseurl";
+
 export default {
   emits: {
     closeNotification() {
       return true;
     },
   },
+  data() {
+    return {
+      adminNotificatins: [],
+    };
+  },
   computed: {
     notifications() {
+      this.setNotifications();
       return this.$store.getters["admin/notifications"];
     },
   },
+  watch: {
+    notifications(newValue) {
+      this.adminNotificatins = newValue;
+    },
+  },
   methods: {
+    setNotifications() {
+      this.adminNotificatins = this.$store.getters["admin/notifications"];
+      console.log("admin notification", this.adminNotificatins);
+    },
+    viewMessage(notification) {
+      if (notification.data.type === "mentor") {
+        this.gotoMentorPage(notification);
+      } else if (notification.data.type === "blog") {
+        this.gotoBlogPage(notification);
+      } else if (notification.data.type === "rolemodel") {
+        this.gotoRoleModelPage(notification);
+      }
+      console.log("notification type = ", notification.data.type);
+      this.closeNotificationDialog();
+      this.markAsRead(notification);
+      notification.read_at = new Date();
+    },
     gotoMentorPage() {
       this.$router.push({ name: "MentorPage" });
-      this.$emit("closeNotification");
     },
-    gotoBlogPage(blogId) {
-      this.$router.push({ name: "BlogDetail", params: { blogId: blogId } });
-      this.$emit("closeNotification");
+    gotoBlogPage(notification) {
+      this.$router.push({
+        name: "BlogDetail",
+        params: { blogId: notification.data.content.id },
+      });
     },
-    gotoRoleModelPage(roleModelId) {
+    gotoRoleModelPage(notification) {
       this.$router.push({
         name: "RoleModelDetail",
-        params: { roleModelId: roleModelId },
+        params: { roleModelId: notification.data?.content?.id },
       });
+    },
+    closeNotificationDialog() {
       this.$emit("closeNotification");
     },
-    markAsRead() {},
-    filterUnReadNotification() {},
-    allNotification() {},
+    markAsRead(notification) {
+      // var notificationId = encodeURI(notification.id);
+      // console.log("notification id = ", notification.id);
+      try {
+        var response = apiClient.get(`api/mark_as_read/${notification.id}`);
+        if (response.status === 200) {
+          // this.$store.commit("admin/setNotifications", response.data);
+          notification.read_at = new Date();
+        }
+      } catch (err) {
+        console.log("error");
+      }
+    },
+    markAllAsRead() {
+      try {
+        var response = apiClient.get("api/mark_all_as_read");
+        if (response.status === 200) {
+          this.$store.commit("admin/setNotifications", response.data);
+        }
+      } catch (err) {
+        console.log("error");
+      }
+    },
+    filterUnReadNotification() {
+      this.adminNotificatins = this.notifications.filter((notification) => {
+        notification.read_at === null;
+      });
+    },
+    allNotification() {
+      this.adminNotificatins = this.notifications;
+    },
     formatingTime(createdAt) {
-      var seconds = Number(new Date(createdAt));
-      var year = Math.floor(seconds / 31536000);
+      var createdDate = new Date(createdAt);
+      var dateNow = new Date();
+      var createdseconds = Math.floor(createdDate.getTime() / 1000);
+      var secondNow = Math.floor(dateNow.getTime() / 1000);
+
+      console.log("createdDate =  ", createdDate);
+      console.log("dateNow =  ", dateNow);
+      var seconds = createdseconds - secondNow;
+      console.log("seconds = ", seconds);
+      var years = Math.floor(seconds / 31536000);
       var weeks = Math.floor(seconds / 604800);
-      var days = Math.floor(seconds / (3600 * 24));
-      var hours = Math.floor((seconds % (3600 * 24)) / 3600);
-      var minuts = Math.floor((seconds % 3600) / 60);
-      var second = Math.floor(seconds % 60);
+      var days = Math.floor(seconds / 86400);
+      var hours = Math.floor(seconds / 3600);
+      var minuts = Math.floor(seconds / 60);
+      var second = seconds;
       var yearDisplay =
-        year > 0 ? year + (year == 1 ? " year ago, " : " years ago") : 0;
+        years > 0 ? years + (years == 1 ? " year ago, " : " years ago") : 0;
       var weekDisplay =
         weeks > 0 ? weeks + (weeks == 1 ? " week ago, " : " weeks ago") : 0;
-      var dDisplay = days > 0 ? days + (days == 1 ? " day ago, " : " days ago") : 0;
+      var dDisplay =
+        days > 0 ? days + (days == 1 ? " day ago, " : " days ago") : 0;
       var hDisplay =
         hours > 0 ? hours + (hours == 1 ? " hour ago, " : " hours ago") : 0;
       var mDisplay =
-        minuts > 0 ? minuts + (minuts == 1 ? " minute ago, " : " minutes ago") : 0;
+        minuts > 0
+          ? minuts + (minuts == 1 ? " minute ago, " : " minutes ago")
+          : 0;
       var sDisplay =
-        second > 0 ? second + (second == 1 ? " second ago" : " seconds ago") : 0;
-      if (year > 0) {
+        second > 0
+          ? second + (second == 1 ? " second ago" : " seconds ago")
+          : 0;
+      if (years > 0) {
         return yearDisplay;
       } else if (weeks > 0) {
         return weekDisplay;
@@ -180,5 +260,8 @@ img {
 p {
   padding: 0;
   margin: 0;
+}
+.textprimary {
+  color: blue;
 }
 </style>

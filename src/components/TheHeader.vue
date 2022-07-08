@@ -11,10 +11,12 @@
             class="notification-icon me-3 position-relative border rounded shadow-sm"
           >
             <div class="bell-size"><i class="far fa-bell"></i></div>
-            <div v-if="arrangedNotifications" class="bage-text">
-              <span class="bage-color px-1 rounded-circle">{{
-                arrangedNotifications
-              }}</span>
+            <div class="bage-text">
+              <span
+                v-if="newNotifications?.length"
+                class="bage-color px-1 rounded-circle"
+                >{{ newNotifications?.length }}</span
+              >
             </div>
           </button>
           <div class="dropdown">
@@ -30,10 +32,10 @@
                 alt="profile picture"
                 class="img-fluid rounded"
               />
-              <dir class="ms-1 me-2 mt-2">
+              <dir class="ms-1 me-2 small">
                 {{ user.first_name + " " + user.last_name }}
               </dir>
-              <div class="fs-5 ms-3 me-2 mt-2">
+              <div class="fs-5 ms-auto me-2 mt-2">
                 <i class="fas fa-chevron-down"></i>
               </div>
             </button>
@@ -70,6 +72,11 @@ export default {
       return true;
     },
   },
+  // data(){
+  //   return {
+  //     newNotifications:[]
+  //   }
+  // },
   computed: {
     user() {
       return this.$store.getters.user;
@@ -77,14 +84,19 @@ export default {
     notifications() {
       return this.$store.getters["admin/notifications"];
     },
-    arrangedNotifications() {
-      var notification =
-        this.notifications.blog?.length +
-        this.notifications.rolemodel?.length +
-        this.notifications.mentor?.length;
-
-      return notification;
+    newNotifications() {
+      var addedNotifications = [];
+      this.notifications.forEach((notificatin) => {
+        if (Number(notificatin.seen) === Number(0)) {
+          addedNotifications.push(notificatin);
+        }
+      });
+      console.log("new notification = ", addedNotifications);
+      return addedNotifications;
     },
+  },
+  created() {
+    
   },
   methods: {
     accountSetting() {
@@ -101,8 +113,18 @@ export default {
         console.log("logout successfully");
       }
     },
-    showNotification() {
+    async showNotification() {
       this.$emit("viewNotification");
+      if (this.newNotifications?.length) {
+        try {
+          var response = await apiClient.get(`api/mark_all_as_seen`);
+          if (response.status === 200) {
+            this.$store.commit("admin/setNotifications", response.data);
+          }
+        } catch (err) {
+          console.log("err", err);
+        }
+      }
     },
   },
 };

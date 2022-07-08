@@ -5,7 +5,7 @@
         <i class="fas fa-times"></i>
       </button>
     </div>
-    <div class="profileImg text-center mt-3">
+    <div class="profileImg mt-3 ms-5">
       <div class="position-relative profile_photo">
         <img
           v-if="!image"
@@ -184,9 +184,9 @@ import {
   sameAs,
 } from "@vuelidate/validators";
 import apiClient from "../../components/baseurl/index";
-import axios from "axios";
+import fileApiClient from "../../components/baseurl/multipart";
+// import axios from "axios";
 export default {
-  props: {},
   emits: {
     cancelModal() {
       return true;
@@ -307,10 +307,9 @@ export default {
               phone_no: response.data.phone_no,
               profile_picture: this.user.profile_picture,
             };
+            console.log("edited user =", editedUser);
             this.$store.commit("setUser", editedUser);
             this.$toast.success(`successfully edited`);
-            // console.log("edited user ", user);
-            // console.log("response data= ", response.data);
             this.isNewInfo = false;
           }
         } catch (e) {
@@ -354,24 +353,17 @@ export default {
         console.log("loged in user= ", this.user);
         var formData = new FormData();
         formData.append("profile", this.imageFile);
-        var response = await axios.post(
-          `https://admin.super-women.merahitechnologies.com/api/change_profile/${this.user.id}`,
-          formData,
-          {
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "multipart/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        var response = await fileApiClient.post(
+          `api/change_profile/${this.user.id}`,
+          formData);
         if (response.status === 200) {
           // console.log("profile picture saved");
+          localStorage.setItem("user", JSON.stringify(response.data));
           this.$store.commit("setUser", response.data);
           this.$toast.success(`your profile picture changed`);
+          console.log('response after profile change',response.data)
           this.image = false;
-          // console.log("user = ", this.$store.getters.user);
-          // console.log("user data =", response.data);
+          
         }
       } catch (e) {
         this.$toast.error(`Faild to change profile picture`);

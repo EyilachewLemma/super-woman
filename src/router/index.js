@@ -9,6 +9,13 @@ const routes = [
         component: () =>
             import ( /* webpackChunkName: "Login" */ '../views/admin/Login.vue'),
     },
+    {
+        path: '/reset-password/:token',
+        name: 'Forgot-Password',
+        props: true,
+        component: () =>
+            import ( /* webpackChunkName: "Login" */ '../views/admin/NewPassword.vue'),
+    },
 ]
 
 const router = createRouter({

@@ -7,24 +7,24 @@
 <base-card>
 <div class="formContainer">
 <div class="mt-3" :class="{warning:v$.blogTitle.$error}">
-    <label for="title">Blog Title</label>
+    <label for="title">Blog title</label>
     <input type="text" class="form-control" id="title" v-model="blogTitle">
     <span class="error-msg mt-1">{{ v$.blogTitle.$errors[0]?.$message}}</span>
   </div>
   <div class="mt-2" :class="{warning:v$.blogTags.$error}">
-    <label for="tags">Enter Blog Tags separet by comma</label>
+    <label for="tags">Enter blog tags separeted by comma</label>
     <input type="text" class="form-control" id="tags" v-model="blogTags">
     <span class="error-msg mt-1">{{ v$.blogTags.$errors[0]?.$message}}</span>
   </div>
     <div class="mb-3 mt-2" :class="{warning:v$.fields.$error}">
-  <label for="interestedin">Select Field of the Blog</label>
+  <label for="interestedin">Select field of blog</label>
   <select class="form-select" size="3" multiple v-model="fields" id="interestedin">
   <option v-for="field in blogfields" :key="field.id" :value="field.id">{{field.title}}</option>
 </select>
  <span class="error-msg mt-1">{{ v$.fields.$errors[0]?.$message}}</span>
   </div>
    <div class="mt-2" :class="{warning:v$.timeToRead.$error}">
-    <label for="timetakestoread">Time Take to Read</label>
+    <label for="timetakestoread">Time it takes to read in mimute</label>
     <input type="number" class="form-control" id="timetakestoread" v-model="timeToRead">
     <span class="error-msg mt-1">{{ v$.timeToRead.$errors[0]?.$message}}</span>
   </div>
@@ -43,7 +43,7 @@
  
  </div>
 </base-card>
-<delete-modal id="deleteModal" :isSuccess="isSucceessfull" :isOKRequired="false">
+<delete-modal id="deleteModal" :isSuccess="isSucceessfull" :isOKRequired="false" :modalHeader="modalHeader">
       <template #modalBody>
          <div>{{modalTitle}} </div>
       </template>
@@ -73,6 +73,7 @@ export default {
             isLoading:false,
             isSucceessfull:false,
             modalTitle:'',
+            modalHeader:''
                                     
         }
     },
@@ -128,12 +129,14 @@ export default {
             if(response.status === 201){
                this.isSucceessfull = true
               this.modalTitle = 'You have added one Blog Successfully'
+              this.modalHeader = 'Successful'
               this.deletemodal.show()
             }
           }
           catch(e){
              this.isSucceessfull = false
               this.modalTitle = 'Faild to add Blog'
+              this.modalHeader = 'Faild'
               this.deletemodal.show()
           }
           finally{
