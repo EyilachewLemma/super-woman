@@ -2,8 +2,16 @@
   <div @click="$router.back()" class="ms-3 mt-3 fs-4">
     <i class="fas fa-chevron-left back-chevron"></i>
   </div>
-  <div class="d-flex justify-content-between mt-3">
+  <div class="d-flex justify-content-between mt-3 mx-3">
     <div class="ms-3">Edit {{ entity }}</div>
+     <div >
+      <!-- <div>Select Language</div> -->
+      <select class="form-select" aria-label="Default select example" v-model="selectedLanguage" @change="setLanguage($event)">
+  <option value="en">English</option>
+  <option value="amh">አማርኛ</option>
+  <option value="oro">Afaan Oromo</option>
+</select>
+    </div>
 
     <!-- <button @click="sendPost()" class="savebtn btn py-1 me-3">Save</button> -->
   </div>
@@ -127,7 +135,8 @@ export default {
       imageFiles: [],
       isSucceessfull: false,
       modalTitle: "",
-      modalHeader:''
+      modalHeader:'',
+      selectedLanguage:'en'
     };
   },
   created() {
@@ -152,8 +161,13 @@ export default {
     imageSelected(images) {
       this.selectedImages = images;
     },
+     setLanguage(event){
+      localStorage.setItem('language',event.target.value)
+      this.$store.commit('admin/setLang',event.target.value)
+
+    },
     async fetchRoleModelData() {
-      var response = await apiClient.get("api/role_models/" + this.roleModelId);
+      var response = await apiClient.get(`api/role_models/${this.roleModelId}?lang=${this.selectedLanguage}`);
       if (response.status === 200) {
         this.imageFiles = response.data.images;
         this.content = response.data.content;
@@ -170,7 +184,7 @@ export default {
       });
     },
     async fetchBlogData() {
-      var response = await apiClient.get("api/blogs/" + this.blogId);
+      var response = await apiClient.get(`api/blogs/${this.blogId}?lang=${this.selectedLanguage}`);
       if (response.status === 200) {
         this.imageFiles = response.data.images;
         this.title = response.data.title;
@@ -206,8 +220,7 @@ export default {
             detailContents
           );
         } else {
-          response = await fileApiClient.put(
-            "api/role_models/" + this.roleModelId,
+          response = await fileApiClient.put(`api/role_models/${this.roleModelId}?lang=${this.selectedLanguage}`,
             detailContents
           );
         }

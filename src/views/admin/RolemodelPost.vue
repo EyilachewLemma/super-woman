@@ -2,7 +2,7 @@
   <div @click="$router.back()" class="ms-3 mt-3 fs-4">
     <i class="fas fa-chevron-left back-chevron"></i>
   </div>
-  <div class="d-flex justify-content-between align-items-center mt-3">
+  <div class="d-flex justify-content-between align-items-center mx-3 mt-3">
     <div class="ms-3">Post Role Model</div>
    <div class="ms-auto">
      <base-button
@@ -14,9 +14,9 @@
     <div >
       <!-- <div>Select Language</div> -->
       <select class="form-select" aria-label="Default select example" v-model="selectedLanguage" @change="setLanguage($event)">
-  <option value="1">English</option>
-  <option value="2">አማርኛ</option>
-  <option value="3">Afaan Oromo</option>
+  <option value="en">English</option>
+  <option value="amh">አማርኛ</option>
+  <option value="oro">Afaan Oromo</option>
 </select>
     </div>
       </div>
@@ -52,6 +52,13 @@
           id="timeToRead"
           v-model="timeToRead"
         />
+      </div>
+      <!-- short description -->
+      <div>
+        <label for="shortDescription mb-2">Short Description</label>
+        <div class="form-floating">
+  <textarea class="form-control" placeholder="Leave a comment here" id="shortDescription" v-model="intro"></textarea>
+</div>
       </div>
     </div>
   </base-card>
@@ -98,6 +105,7 @@ export default {
       roleModelDetail: "",
       interests: [],
       timeToRead: "",
+      intro:'',
       postedDate: "",
       selectedImages: [],
       isLoading: false,
@@ -105,7 +113,7 @@ export default {
       modalHeader:'',
       deletemodal: null,
       modalTitle: "",
-      selectedLanguage:''
+      selectedLanguage:'en'
     };
   },
   mounted() {
@@ -132,13 +140,13 @@ export default {
       });
       formData.append("title", this.title);
       formData.append("time_take_to_read", this.timeToRead);
-      // formData.append('posted_date',this.postedDate)
       formData.append("content", this.roleModelDetail);
+      formData.append("intro",this.intro)
       //         for (var key of formData.entries()) {
       //     console.log('key = ',key);
       // }
       try {
-        var response = await fileApiClient.post("api/role_models", formData);
+        var response = await fileApiClient.post(`api/role_models?lang=${this.selectedLanguage}`, formData);
         if (response.status === 201) {
           this.isSuccessfull = true;
           this.modalTitle = "You have added one Role Model Successfully";
@@ -164,6 +172,7 @@ export default {
     },
     setLanguage(event){
       localStorage.setItem('language',event.target.value)
+      this.$store.commit('admin/setLang',event.target.value)
 
     }
   },

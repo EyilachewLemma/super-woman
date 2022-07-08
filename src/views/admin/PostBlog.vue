@@ -28,10 +28,17 @@
     <input type="number" class="form-control" id="timetakestoread" v-model="timeToRead">
     <span class="error-msg mt-1">{{ v$.timeToRead.$errors[0]?.$message}}</span>
   </div>
+   <!-- short description -->
+      <div :class="{warning:v$.intro.$error}">
+        <label for="shortDescription mb-2">Short Description</label>
+        <div class="form-floating">
+  <textarea class="form-control" placeholder="Leave a comment here" id="shortDescription" v-model="intro"></textarea>
+</div>
+      </div>
   <!-- ckeditor -->
 <div class="ckeditor mt-2 pt-2" :class="{warning:v$.blogDetail.$error}">
   <file-editor content="Click here to write the content" @editorContent="acceptEditorData($event)"></file-editor>
-   <span class="error-msg mt-1">{{ v$.blogDetail.$errors[0]?.$message}}</span>
+   <span class="error-msg mt-1">{{ v$.intro.$errors[0]?.$message}}</span>
 </div>
 </div>
 
@@ -51,7 +58,7 @@
 </template>
 <script>
 import useValidate from '@vuelidate/core'
-import { required,helpers} from '@vuelidate/validators'
+import { required,helpers, maxLength} from '@vuelidate/validators'
 import FileEditor from '../../components/FileEditor'
 import ImagePreview from '../../components/ImagePreview'
 import fileApiClient from '../../components/baseurl/multipart.js'
@@ -70,6 +77,7 @@ export default {
             fields:[],
             selectedImages: [],
             timeToRead:'',
+            intro:'',
             isLoading:false,
             isSucceessfull:false,
             modalTitle:'',
@@ -84,6 +92,9 @@ export default {
             blogDetail:{required:helpers.withMessage('blog detail can not be empty',required)},
              timeToRead:{required:helpers.withMessage('time take  can not be empty',required)},
             fields:{required:helpers.withMessage('please select fields',required)},
+             intro:{required:helpers.withMessage('write short introduction about the blog',required),
+             max:helpers.withMessage('introduction should be completed with lessthan 250 characters',maxLength(250))
+             },
         }
     },
       mounted() {

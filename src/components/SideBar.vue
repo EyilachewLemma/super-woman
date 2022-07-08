@@ -42,6 +42,13 @@
       <div class="icon ms-3 fs-4"><i class="fas fa-users"></i></div>
       <div class="label ms-2 mt-1 p-1">User</div>
     </router-link>
+     <router-link
+      :to="{ name: 'Language' }"
+      class="field sidbar-item rounded mt-2 d-flex"
+    >
+      <div class="icon ms-3 fs-4"><i class="fa-solid fa-globe"></i></div>
+      <div class="label ms-2 mt-1 p-1">Language</div>
+    </router-link>
     <router-link
       :to="{ name: 'FieldPage' }"
       class="field sidbar-item rounded mt-2 d-flex"

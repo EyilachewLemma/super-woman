@@ -124,7 +124,7 @@
 import { required, helpers, email } from "@vuelidate/validators";
 import useValidate from "@vuelidate/core";
 import apiClient from "../../components/baseurl/index";
-// import fileApiClient from "../../components/baseurl/multipart";
+import fileApiClient from "../../components/baseurl/multipart";
 export default {
   data() {
     return {
@@ -203,10 +203,10 @@ export default {
             this.userCrediantail
           );
           if (response.status === 200) {
-            // let toPath= this.$route.query.to || '/staff'
             apiClient.defaults.headers.common[
               "Authorization"
             ] = `Bearer ${response.data.access_token}`;
+            fileApiClient.defaults.headers.common["Authorization"] = `Bearer ${response.data.access_token}`;
            this.$store.commit("setToken", response.data.access_token);
             this.$store.commit("setUser", response.data.user);
             this.$store.commit("setIsAuthenticated", true);

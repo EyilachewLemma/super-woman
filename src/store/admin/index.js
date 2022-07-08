@@ -7,7 +7,8 @@ export default {
             fields: [],
             writers: [],
             notifications: [],
-            languages: []
+            languages: [],
+            lang: 'en'
         }
     },
     getters: {
@@ -22,6 +23,9 @@ export default {
         },
         languages(state) {
             return state.languages
+        },
+        lang(state) {
+            return state.lang
         }
     },
     mutations: {
@@ -36,6 +40,9 @@ export default {
         },
         setLanguages(state, lanuage) {
             state.languages = lanuage
+        },
+        setLang(state, lang) {
+            state.lang = lang
         }
     },
     actions: {

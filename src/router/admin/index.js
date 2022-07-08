@@ -92,6 +92,13 @@ export default {
             component: () =>
                 import ( /* webpackChunkName: "EditBlog" */ '../../views/admin/EditingPage.vue'),
         },
-      
+        {
+            path: '/language',
+            name: 'Language',
+            props: true,
+            component: () =>
+                import ( /* webpackChunkName: "Language" */ '../../views/admin/AddLanguage.vue'),
+        },
+
     ]
 }
