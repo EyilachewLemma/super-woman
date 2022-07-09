@@ -21,6 +21,7 @@
       ></base-button>
       <!-- <button  @click="verifyRoleModel(roleModelDetails)" class="btn confirmbtn verify me-3">Verify</button> -->
       <button @click="editRoleModel()" class="btn edit me-3">Edit</button>
+      <button @click="translateRoleModel()" class="btn edit me-3">Translate</button>
       <button
         @click="deleteRoleModel()"
         :disabled="isDeleteLoading"
@@ -177,6 +178,16 @@ export default {
       document.getElementById("deleteRoleModel")
     );
   },
+  computed:{
+     lang(){
+      return this.$store.getters["admin/lang"];
+    }
+  },
+  watch:{
+    lang(){
+    this.fetchRoleModelDetails();
+    }
+  },
   methods: {
     backPage() {
       this.$router.back();
@@ -184,9 +195,7 @@ export default {
     async fetchRoleModelDetails() {
       this.$store.commit("setIsItemLoading", true);
       try {
-        var response = await apiClient.get(
-          "api/role_models/" + this.roleModelId
-        );
+        var response = await apiClient.get(`api/role_models/${this.roleModelId}?lang=${this.lang}`)
         if (response.status === 200) {
           this.roleModelDetails = response.data;
           this.slicedImages = this.roleModelDetails.images.slice(1);
@@ -248,6 +257,12 @@ export default {
         params: { entity: "Role Model", roleModelId: this.roleModelId },
       });
     },
+    translateRoleModel(){
+      this.$router.push({
+        name: "TranslateRolemodel",
+        params: {roleModelId: this.roleModelId },query:{entity:'Role Model'}});
+    },
+    
     deleteRoleModel() {
       this.modalTitle = "Do you want to delete this Role Model ?";
       this.isSuccess = false;

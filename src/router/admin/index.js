@@ -86,6 +86,20 @@ export default {
                 import ( /* webpackChunkName: "EditRoleModel" */ '../../views/admin/EditingPage.vue'),
         },
         {
+            path: '/translate-rolemodel/:roleModelId',
+            name: 'TranslateRolemodel',
+            props: true,
+            component: () =>
+                import ( /* webpackChunkName: "TranslateRolemodel" */ '../../views/admin/TranslationForm.vue'),
+        },
+        {
+            path: '/translate-blog/:blogId',
+            name: 'TranslateBlog',
+            props: true,
+            component: () =>
+                import ( /* webpackChunkName: "TranslateBlog" */ '../../views/admin/TranslationForm.vue'),
+        },
+        {
             path: '/edit-blog/:entity/:blogId',
             name: 'EditBlog',
             props: true,

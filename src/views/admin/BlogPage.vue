@@ -68,7 +68,7 @@
         @click="postNewBlog()"
         class="btn addpostbtn align-self-start mt-4"
       >
-        Post New Blog
+        Add New Blog
       </button>
     </div>
     <div class="text-center mt-2">{{ searchResults }}</div>
@@ -189,6 +189,7 @@ export default {
     };
   },
   created() {
+    this.search.lang = this.$store.getters['admin/lang']
     this.fetchBlogs(this.search);
     this.fetchBlogSummary();
   },
@@ -196,6 +197,9 @@ export default {
     fields() {
       return this.$store.getters["admin/fields"];
     },
+      lang(){
+      return this.$store.getters["admin/lang"]
+    }
   },
   methods: {
     postNewBlog() {
@@ -205,7 +209,7 @@ export default {
       this.$store.commit("setIsItemLoading", true);
       try {
         var response = await apiClient.get(
-          `api/blogs?page=${search.page}&search=${search.searchBy}&filter=${search.filterBy}&per_page=${search.per_page}`
+          `api/blogs?page=${search.page}&search=${search.searchBy}&filter=${search.filterBy}&per_page=${search.per_page}&lang=${localStorage.getItem('language')}`
         );
         if (response.status === 200) {
           this.blogs = response.data;
@@ -236,6 +240,7 @@ export default {
     },
     filterBlog(event) {
       this.search.filterBy = event.target.value;
+      this.search.lang = this.lang
       this.fetchBlogs(this.search);
     },
     sortBlogsBy(event, blogs) {
@@ -279,18 +284,22 @@ export default {
       });
     },
     searchBlog() {
+      this.search.lang = this.lang
       this.fetchBlogs(this.search);
     },
     changePerPageValue(event) {
       this.search.per_page = event.target.value;
+      this.search.lang = this.lang
       this.fetchBlogs(this.search);
     },
     backChivron() {
       this.search.page = this.search.page - 1;
+      this.search.lang = this.lang
       this.fetchBlogs(this.search);
     },
     forWardChivron() {
       this.search.page = this.search.page + 1;
+      this.search.lang = this.lang
       this.fetchBlogs(this.search);
     },
   },

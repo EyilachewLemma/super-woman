@@ -198,9 +198,7 @@ export default {
       if (!this.v$.userCrediantail.$error) {
         this.isLoading = true;
         try {
-          var response = await apiClient.post(
-            "/api/login",
-            this.userCrediantail
+          var response = await apiClient.post("/api/login",this.userCrediantail
           );
           if (response.status === 200) {
             apiClient.defaults.headers.common[

@@ -188,6 +188,7 @@ export default {
     };
   },
   created() {
+    this.search.lang = this.$store.getters['admin/lang']
     this.fetchRoleModels(this.search);
     this.fetchSummaryData();
   },
@@ -195,6 +196,9 @@ export default {
     fields() {
       return this.$store.getters["admin/fields"];
     },
+    lang(){
+      return this.$store.getters["admin/lang"]
+    }
   },
   methods: {
     postNewRoleModel() {
@@ -204,7 +208,7 @@ export default {
       this.$store.commit("setIsItemLoading", true);
       try {
         var response = await apiClient.get(
-          `api/role_models?page=${search.page}&search=${search.searchBy}&filter=${search.filterBy}&per_page=${search.per_page}`
+          `api/role_models?lang=${search.lang}&page=${search.page}&search=${search.searchBy}&filter=${search.filterBy}&per_page=${search.per_page}`
         );
         if (response.status === 200) {
           this.roleModels = response.data;
@@ -234,11 +238,13 @@ export default {
       }
     },
     searchRoleModel() {
+      this.search.lang = this.lang
       this.fetchRoleModels(this.search);
       //  this.resultsFound = this.roleModels.data?.length+' Results'
     },
     filterRoleModel(event) {
       this.search.filterBy = event.target.value;
+      this.search.lang = this.lang
       this.fetchRoleModels(this.search);
       // this.resultsFound = this.roleModels.data?.length +' Results'
     },
@@ -260,14 +266,17 @@ export default {
     },
     changePerPageValue(event) {
       this.search.per_page = event.target.value;
+      this.search.lang = this.lang
       this.fetchRoleModels(this.search);
     },
     backChivron() {
       this.search.page = this.search.page - 1;
+      this.search.lang = this.lang
       this.fetchRoleModels(this.search);
     },
     forWardChivron() {
       this.search.page = this.search.page + 1;
+      this.search.lang = this.lang
       this.fetchRoleModels(this.search);
     },
     sortRolModelByViews(rolmodeles) {

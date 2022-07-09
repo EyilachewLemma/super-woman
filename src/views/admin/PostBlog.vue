@@ -1,8 +1,15 @@
 <template>
  <div @click="$router.back()" class="ms-3 mt-3 fs-4"><i class="fas fa-chevron-left back-chevron"></i></div>
-<div class="d-flex justify-content-between mt-3">
+<div class="d-flex justify-content-between mx-3 mt-3">
   <div class="ms-3"><strong>Post Blog</strong></div>
+  <div class="ms-auto">
  <base-button title="Save" :isLoading="isLoading" @baseButton="saveBlogPost()"></base-button>
+
+  </div>
+      <div>
+      <!-- <div>Select Language</div> -->
+     <language-selector></language-selector>
+    </div>
 </div>
 <base-card>
 <div class="formContainer">
@@ -32,13 +39,15 @@
       <div :class="{warning:v$.intro.$error}">
         <label for="shortDescription mb-2">Short Description</label>
         <div class="form-floating">
-  <textarea class="form-control" placeholder="Leave a comment here" id="shortDescription" v-model="intro"></textarea>
+  <textarea class="form-control" style="height:auto" placeholder="Leave a comment here" id="shortDescription" v-model="intro"></textarea>
+
 </div>
+<span class="error-msg mt-1">{{ v$.intro.$errors[0]?.$message}}</span>
       </div>
   <!-- ckeditor -->
 <div class="ckeditor mt-2 pt-2" :class="{warning:v$.blogDetail.$error}">
   <file-editor content="Click here to write the content" @editorContent="acceptEditorData($event)"></file-editor>
-   <span class="error-msg mt-1">{{ v$.intro.$errors[0]?.$message}}</span>
+   <span class="error-msg mt-1">{{ v$.blogDetail.$errors[0]?.$message}}</span>
 </div>
 </div>
 
@@ -81,7 +90,7 @@ export default {
             isLoading:false,
             isSucceessfull:false,
             modalTitle:'',
-            modalHeader:''
+            modalHeader:'',
                                     
         }
     },
@@ -93,7 +102,7 @@ export default {
              timeToRead:{required:helpers.withMessage('time take  can not be empty',required)},
             fields:{required:helpers.withMessage('please select fields',required)},
              intro:{required:helpers.withMessage('write short introduction about the blog',required),
-             max:helpers.withMessage('introduction should be completed with lessthan 250 characters',maxLength(250))
+             max:helpers.withMessage('introduction should be described with lessthan 250 characters',maxLength(250))
              },
         }
     },
@@ -103,7 +112,10 @@ export default {
      computed:{
       blogfields(){
         return this.$store.getters['admin/fields']
-      }
+      },
+       lang(){
+      return this.$store.getters["admin/lang"]
+    }
     },
     methods: {
         acceptEditorData(data){
@@ -114,9 +126,10 @@ export default {
           this.selectedImages = images
         },
        async saveBlogPost(){
-         this.isLoading = true
             this.v$.$validate()
-               const blogTags = this.blogTags.split(',')
+            if(!this.v$.$error){
+              this.isLoading = true
+            const blogTags = this.blogTags.split(',')
             var formData = new FormData()
             this.selectedImages.forEach((image,i) =>{
                 formData.append(`images[${i}]`,image)
@@ -127,16 +140,16 @@ export default {
              this.fields.forEach((field,i) =>{
                 formData.append(`interests[${i}]`+i,field)
             })
-            formData.append('title',this.blogTitle)
+            formData.append('blog_title',this.blogTitle)
             formData.append('time_take_to_read',this.timeToRead)
-            // formData.append('posted_date',this.postedDate)
-            formData.append('content',this.blogDetail)
+            formData.append('blog_intro',this.intro)
+            formData.append('blog_content',this.blogDetail)
             for (var key of formData.entries()) {
         console.log('key = ',key);
         console.log('blog content ====',this.blogDetail)
     }
        try {
-            var response = await fileApiClient.post('api/blogs',formData)
+            var response = await fileApiClient.post(`api/blogs?lang=${this.lang}`,formData)
             if(response.status === 201){
                this.isSucceessfull = true
               this.modalTitle = 'You have added one Blog Successfully'
@@ -153,6 +166,7 @@ export default {
           finally{
             this.isLoading = false
           }
+            }
         },
        
          },

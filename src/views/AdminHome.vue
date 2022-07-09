@@ -40,8 +40,6 @@ import TheHeader from "../components/TheHeader.vue";
 import SideBar from "../components/SideBar.vue";
 import AccountSetting from "./admin/AccountSetting.vue";
 import NotificationPage from "./admin/NotificationPage.vue";
-import apiClient from "../components/baseurl/index.js";
-import fileApiClient from '../components/baseurl/multipart'
 
 export default {
   components: {
@@ -57,18 +55,8 @@ export default {
     };
   },
   beforeCreate() {
-    if (localStorage.getItem("tokenB")) {
-      let token = localStorage.getItem("tokenB");
-      this.$store.commit("setToken", token);
-      this.$store.commit("setIsAuthenticated", true);
-      apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      fileApiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
-    if (localStorage.getItem("user")) {
-      let user = localStorage.getItem("user");
-      console.log("user", user);
-      this.$store.commit("setUser", JSON.parse(user));
-    }
+   
+   
   },
   created() {
     this.$store.dispatch("admin/fetchFields");

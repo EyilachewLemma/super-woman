@@ -19,7 +19,7 @@
           <td class="py-2">{{ language.name  }}</td>
           <td class="py-2">{{ language.code }}</td>
           <td>
-            <button @click="editLanguage(language.id)" class="border-none background-none">edit</button>
+            <button @click="editLanguage(language.id)" class="editBtn"><i class="far fa-edit"></i></button>
           </td>
         </tr>
       </tbody>
@@ -322,5 +322,13 @@ li span:hover {
 .warning span {
   display: inline;
   color: red;
+}
+.editBtn{
+    background: none;
+    border: none;
+
+}
+.editBtn:hover{
+    color: #eb9713;
 }
 </style>

@@ -13,24 +13,22 @@
    </div>
     <div >
       <!-- <div>Select Language</div> -->
-      <select class="form-select" aria-label="Default select example" v-model="selectedLanguage" @change="setLanguage($event)">
-  <option value="en">English</option>
-  <option value="amh">አማርኛ</option>
-  <option value="oro">Afaan Oromo</option>
-</select>
+      <language-selector></language-selector>
     </div>
       </div>
   <base-card>
     <div class="formContainer">
-      <div class="mb-3">
+      <div class="mb-3" :class="{warning:v$.title.$error}">
         <label for="title">Role model title</label>
         <input type="text" class="form-control" id="title" v-model="title" />
+        <span class="error-msg mt-1">{{ v$.title.$errors[0]?.$message}}</span>
       </div>
-      <div class="mb-3">
+      <div class="mb-3" :class="{warning:v$.tags.$error}">
         <label for="tags">Please enter role model tags separet by comma</label>
         <input type="text" class="form-control" id="tags" v-model="tags" />
+         <span class="error-msg mt-1">{{ v$.tags.$errors[0]?.$message}}</span>
       </div>
-      <div class="mb-3">
+      <div class="mb-3" :class="{warning:v$.interests.$error}">
         <label for="interestedin">Select role model's fields</label>
         <select
           class="form-select"
@@ -43,8 +41,9 @@
             {{ field.title }}
           </option>
         </select>
+         <span class="error-msg mt-1">{{ v$.interests.$errors[0]?.$message}}</span>
       </div>
-      <div class="mb-3">
+      <div class="mb-3" :class="{warning:v$.timeToRead.$error}">
         <label for="timeToRead">Time it takes to read in minute</label>
         <input
           type="number"
@@ -52,23 +51,26 @@
           id="timeToRead"
           v-model="timeToRead"
         />
+         <span class="error-msg mt-1">{{ v$.timeToRead.$errors[0]?.$message}}</span>
       </div>
       <!-- short description -->
-      <div>
+      <div :class="{warning:v$.intro.$error}">
         <label for="shortDescription mb-2">Short Description</label>
         <div class="form-floating">
   <textarea class="form-control" placeholder="Leave a comment here" id="shortDescription" v-model="intro"></textarea>
 </div>
+ <span class="error-msg mt-1">{{ v$.intro.$errors[0]?.$message}}</span>
       </div>
     </div>
   </base-card>
   <base-card>
     <div class="formContainer">
-      <div class="ckeditor mt-2 mb-3">
+      <div class="ckeditor mt-2 mb-3" :class="{warning:v$.roleModelDetail.$error}">
         <file-editor
           content="Clic here to write the content"
           @editorContent="sendToParent($event)"
         ></file-editor>
+         <span class="error-msg mt-1">{{ v$.roleModelDetail.$errors[0]?.$message}}</span>
       </div>
       <image-preview
         title="Role Model"
@@ -93,6 +95,8 @@ import FileEditor from "../../components/FileEditor.vue";
 import ImagePreview from "../../components/ImagePreview.vue";
 import fileApiClient from "../../components/baseurl/multipart.js";
 import { Modal } from "bootstrap";
+import useValidate from '@vuelidate/core'
+import { required,helpers, maxLength} from '@vuelidate/validators'
 export default {
   components: {
     FileEditor,
@@ -100,6 +104,7 @@ export default {
   },
   data() {
     return {
+      v$:useValidate(),
       title: "",
       tags: "",
       roleModelDetail: "",
@@ -116,6 +121,18 @@ export default {
       selectedLanguage:'en'
     };
   },
+      validations(){
+        return{
+            title:{required:helpers.withMessage('title can not be empty',required)},
+            tags:{required:helpers.withMessage('Please enter tags separet by comma',required)},
+            roleModelDetail:{required:helpers.withMessage('role model detail can not be empty',required)},
+             timeToRead:{required:helpers.withMessage('time take  can not be empty',required)},
+            interests:{required:helpers.withMessage('please select fields',required)},
+             intro:{required:helpers.withMessage('write short introduction about the role model',required),
+             max:helpers.withMessage('introduction should be described with lessthan 250 characters',maxLength(250))
+             },
+        }
+    },
   mounted() {
     this.deletemodal = new Modal(document.getElementById("deleteModal"));
   },
@@ -123,9 +140,14 @@ export default {
     fields() {
       return this.$store.getters["admin/fields"];
     },
+     lang(){
+      return this.$store.getters["admin/lang"]
+    }
   },
   methods: {
     async savePost() {
+      this.v$.$validate()
+      if(!this.v$.$error){
       this.isLoading = true;
       const roleModelTags = this.tags.split(",");
       var formData = new FormData();
@@ -146,7 +168,7 @@ export default {
       //     console.log('key = ',key);
       // }
       try {
-        var response = await fileApiClient.post(`api/role_models?lang=${this.selectedLanguage}`, formData);
+        var response = await fileApiClient.post(`api/role_models?lang=${this.lang}`, formData);
         if (response.status === 201) {
           this.isSuccessfull = true;
           this.modalTitle = "You have added one Role Model Successfully";
@@ -161,6 +183,7 @@ export default {
       } finally {
         this.isLoading = false;
       }
+      }
     },
     sendToParent(data) {
       this.roleModelDetail = data;
@@ -170,11 +193,7 @@ export default {
       this.selectedImages = images;
       console.log(images);
     },
-    setLanguage(event){
-      localStorage.setItem('language',event.target.value)
-      this.$store.commit('admin/setLang',event.target.value)
-
-    }
+   
   },
 };
 </script>

@@ -6,15 +6,13 @@ import apiClient from './components/baseurl/index';
 import fileApiClient from './components/baseurl/multipart'
 export default {
   created() {
-     if (localStorage.getItem("tokenB")) {
+      if (localStorage.getItem("tokenB")) {
       let token = localStorage.getItem("tokenB");
       this.$store.commit("setToken", token);
       this.$store.commit("setIsAuthenticated", true);
       apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       fileApiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
-    if (localStorage.getItem("user")) {
-      let user = localStorage.getItem("user");
+       let user = localStorage.getItem("user");
       console.log("user", user);
       this.$store.commit("setUser", JSON.parse(user));
     }

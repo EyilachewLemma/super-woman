@@ -6,28 +6,26 @@
     <div class="ms-3">Edit {{ entity }}</div>
      <div >
       <!-- <div>Select Language</div> -->
-      <select class="form-select" aria-label="Default select example" v-model="selectedLanguage" @change="setLanguage($event)">
-  <option value="en">English</option>
-  <option value="amh">አማርኛ</option>
-  <option value="oro">Afaan Oromo</option>
-</select>
+     <language-selector></language-selector>
     </div>
 
     <!-- <button @click="sendPost()" class="savebtn btn py-1 me-3">Save</button> -->
   </div>
   <base-card>
     <div class="formContainer">
-      <div class="mb-3">
+      <div class="mb-3" :class="{warning:v$.title.$error}">
         <label for="title">{{ entity }} Title</label>
         <input type="text" class="form-control" id="title" v-model="title" />
+        <span class="error-msg mt-1">{{ v$.title.$errors[0]?.$message}}</span>
       </div>
-      <div class="mb-3">
+      <div class="mb-3" :class="{warning:v$.tags.$error}">
         <label for="tags"
           >Please Enter {{ entity }} Tags separet by comma</label
         >
         <input type="text" class="form-control" id="tags" v-model="tags" />
+        <span class="error-msg mt-1">{{ v$.tags.$errors[0]?.$message}}</span>
       </div>
-      <div class="mb-3">
+      <div class="mb-3" :class="{warning:v$.fields.$error}">
         <label for="interestedin">Select fields</label>
         <select
           class="form-select"
@@ -40,8 +38,9 @@
             {{ field.title }}
           </option>
         </select>
+        <span class="error-msg mt-1">{{ v$.fields.$errors[0]?.$message}}</span>
       </div>
-      <div class="mb-3">
+      <div class="mb-3" :class="{warning:v$.timeToRead.$error}">
         <label for="timeToRead">Time it takes to Read</label>
         <input
           type="number"
@@ -49,13 +48,25 @@
           id="timeToRead"
           v-model="timeToRead"
         />
+        <span class="error-msg mt-1">{{ v$.timeToRead.$errors[0]?.$message}}</span>
       </div>
-      <div class="ckeditor mt-3 mb-3">
+      <!-- short description -->
+      <div :class="{warning:v$.intro.$error}">
+        <label for="shortDescription mb-2">Short Description</label>
+        <div class="form-floating">
+  <textarea class="form-control" placeholder="Leave a comment here" id="shortDescription" v-model="intro"></textarea>
+
+</div>
+<span class="error-msg mt-1">{{ v$.intro.$errors[0]?.$message}}</span>
+      </div>
+      <div class="ckeditor mt-3 mb-3" :class="{warning:v$.intro.$error}">
         <file-editor
           :content="content"
           @editorContent="sendToParent($event)"
         ></file-editor>
+        <span class="error-msg mt-1">{{ v$.content.$errors[0]?.$message}}</span>
       </div>
+
       <div class="d-flex justify-content-end">
         <base-button
           title="Edit"
@@ -117,6 +128,8 @@ import ImagePreview from "../../components/ImagePreview.vue";
 import fileApiClient from "../../components/baseurl/multipart.js";
 import apiClient from "../../components/baseurl/index.js";
 import { Modal } from "bootstrap";
+import useValidate from '@vuelidate/core'
+import { required,helpers, maxLength} from '@vuelidate/validators'
 export default {
   components: {
     FileEditor,
@@ -125,20 +138,33 @@ export default {
   props: ["entity", "roleModelId", "blogId"],
   data() {
     return {
+      v$:useValidate(),
       title: "",
       tags: "",
       content: "",
       fields: [],
       timeToRead: "",
+      intro:'',
       selectedImages: [],
       isLoading: false,
       imageFiles: [],
       isSucceessfull: false,
       modalTitle: "",
       modalHeader:'',
-      selectedLanguage:'en'
     };
   },
+    validations(){
+        return{
+            title:{required:helpers.withMessage('title can not be empty',required)},
+            tags:{required:helpers.withMessage('blog title can not be empty',required)},
+            content:{required:helpers.withMessage('blog detail can not be empty',required)},
+             timeToRead:{required:helpers.withMessage('time take  can not be empty',required)},
+            fields:{required:helpers.withMessage('please select fields',required)},
+             intro:{required:helpers.withMessage('write short introduction about the blog',required),
+             max:helpers.withMessage('introduction should be described with lessthan 250 characters',maxLength(250))
+             },
+        }
+    },
   created() {
     if (this.entity === "Blog") {
       this.fetchBlogData();
@@ -153,6 +179,18 @@ export default {
     fieldAreas() {
       return this.$store.getters["admin/fields"];
     },
+    lang(){
+      return this.$store.getters["admin/lang"];
+    }
+  },
+  watch:{
+    lang(){
+      if (this.entity === "Blog") {
+      this.fetchBlogData();
+    } else {
+      this.fetchRoleModelData();
+    }
+    }
   },
   methods: {
     sendToParent(data) {
@@ -161,18 +199,16 @@ export default {
     imageSelected(images) {
       this.selectedImages = images;
     },
-     setLanguage(event){
-      localStorage.setItem('language',event.target.value)
-      this.$store.commit('admin/setLang',event.target.value)
-
-    },
     async fetchRoleModelData() {
-      var response = await apiClient.get(`api/role_models/${this.roleModelId}?lang=${this.selectedLanguage}`);
+      try{
+      this.$store.commit('setIsItemLoading',true)
+      var response = await apiClient.get(`api/role_models/${this.roleModelId}?lang=${this.lang}`);
       if (response.status === 200) {
         this.imageFiles = response.data.images;
         this.content = response.data.content;
         this.title = response.data.title;
         this.timeToRead = response.data.time_take_to_read;
+        this.intro = response.data.intro;
         var tagList = [];
         response.data.tags.forEach((tag) => {
           tagList.push(tag.title);
@@ -182,15 +218,22 @@ export default {
       response.data.fields.forEach((field) => {
         this.fields.push(field.id);
       });
+    }
+    finally{
+      this.$store.commit('setIsItemLoading',false)
+    }
     },
     async fetchBlogData() {
-      var response = await apiClient.get(`api/blogs/${this.blogId}?lang=${this.selectedLanguage}`);
+      try{
+        this.$store.commit('setIsItemLoading',true)
+      var response = await apiClient.get(`api/blogs/${this.blogId}?lang=${this.lang}`);
       if (response.status === 200) {
         this.imageFiles = response.data.images;
         this.title = response.data.title;
         // this.tags = response.data.tags.join();
         this.timeToRead = response.data.time_take_to_read;
         this.content = response.data.content;
+        this.intro = response.data.intro;
         var tagList = [];
         response.data.tags.forEach((tag) => {
           tagList.push(tag.title);
@@ -201,9 +244,15 @@ export default {
         });
       }
       console.log("content data to be edited", this.content);
+      }
+      finally{
+        this.$store.commit('setIsItemLoading',false)
+      }
     },
 
     async editContent() {
+      this.v$.$validate()
+      if(!this.v$.$error){
       this.isLoading = true;
       var detailContents = {};
       detailContents.title = this.title;
@@ -211,6 +260,7 @@ export default {
       detailContents.fields = this.fields;
       detailContents.time_take_to_read = this.timeToRead;
       detailContents.content = this.content;
+      detailContents.intro = this.intro;
 
       try {
         var response;
@@ -220,7 +270,7 @@ export default {
             detailContents
           );
         } else {
-          response = await fileApiClient.put(`api/role_models/${this.roleModelId}?lang=${this.selectedLanguage}`,
+          response = await fileApiClient.put(`api/role_models/${this.roleModelId}?lang=${this.lang}`,
             detailContents
           );
         }
@@ -237,6 +287,7 @@ export default {
         this.deletemodal.show();
       } finally {
         this.isLoading = false;
+      }
       }
     },
     async uploadImage() {

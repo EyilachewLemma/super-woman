@@ -4,7 +4,7 @@
   </div>
   <div class="d-flex justify-content-between mt-2 mx-3">
     <div>
-      <strong>{{ blogDetails.title }}</strong>
+      <strong>{{ blogDetails.blog_title }}</strong>
     </div>
     <div class="d-flex">
       <base-button
@@ -20,6 +20,7 @@
         @baseButton="unVerifyBlog(blogDetails)"
       ></base-button>
       <button @click="editBlog()" class="btn edit me-3">Edit</button>
+      <button @click="translateBloge()" class="btn edit me-3">Translate</button>
       <button
         @click="deleteBlog()"
         :disabled="isDeleteLoading"
@@ -87,7 +88,8 @@
       ></button>
     </div>
   </div>
-  <div class="description m-3" v-html="blogDetails.content"></div>
+  
+  <div class="description m-3" v-html="blogDetails.blog_content"></div>
   <div class="horizontal position-relative pb-5">
     <hr />
     <div class="w-100 reviews d-flex p-2">
@@ -168,7 +170,7 @@ export default {
     async fetchBlogDetails() {
       this.$store.commit("setIsItemLoading", true);
       try {
-        var response = await apiClient.get("api/blogs/" + this.blogId);
+        var response = await apiClient.get(`api/blogs/${this.blogId}?lang=${this.$store.getters['admin/lang']}`);
         if (response.status === 200) {
           this.blogDetails = response.data;
           this.slicedImages = this.blogDetails.images.slice(1);
@@ -227,6 +229,11 @@ export default {
         name: "EditBlog",
         params: { entity: "Blog", blogId: this.blogId },
       });
+    },
+    translateBloge(){
+       this.$router.push({
+        name: "TranslateBlog",
+        params: {blogId: this.blogId },query:{entity:'Blog'}});
     },
     deleteBlog() {
       this.modalTitle = "Do you want to delete this Blog ?";
