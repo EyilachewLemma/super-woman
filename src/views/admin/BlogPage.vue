@@ -208,8 +208,7 @@ export default {
     async fetchBlogs(search) {
       this.$store.commit("setIsItemLoading", true);
       try {
-        var response = await apiClient.get(
-          `api/blogs?page=${search.page}&search=${search.searchBy}&filter=${search.filterBy}&per_page=${search.per_page}&lang=${localStorage.getItem('language')}`
+        var response = await apiClient.get(`api/blogs?page=${search.page}&filter=${search.filterBy}&per_page=${search.per_page}&lang=${localStorage.getItem('language')}`
         );
         if (response.status === 200) {
           this.blogs = response.data;
@@ -283,9 +282,21 @@ export default {
         return new Date(obj2.created_at) - new Date(obj1.created_at);
       });
     },
-    searchBlog() {
+    async searchBlog() {
       this.search.lang = this.lang
       this.fetchBlogs(this.search);
+      // 
+      this.$store.commit("setIsItemLoading", true);
+      try {
+        var response = await apiClient.get(`api/search_blogs?search=${this.search.searchBy}`);
+        if (response.status === 200) {
+          this.blogs = response.data;
+          this.searchResults = this.blogs.data?.length + " results found";
+          // this.sortingBlogs = response.data.data;
+        }
+      } finally {
+        this.$store.commit("setIsItemLoading", false);
+      }
     },
     changePerPageValue(event) {
       this.search.per_page = event.target.value;

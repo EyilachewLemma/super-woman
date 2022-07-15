@@ -11,10 +11,9 @@
       @baseButton="savePost()"
     ></base-button>
    </div>
-    <div >
-      <!-- <div>Select Language</div> -->
+    <!-- <div>
       <language-selector></language-selector>
-    </div>
+    </div> -->
       </div>
   <base-card>
     <div class="formContainer">
@@ -168,7 +167,7 @@ export default {
       //     console.log('key = ',key);
       // }
       try {
-        var response = await fileApiClient.post(`api/role_models?lang=${this.lang}`, formData);
+        var response = await fileApiClient.post(`api/role_models?lang=${'en'}`, formData);
         if (response.status === 201) {
           this.isSuccessfull = true;
           this.modalTitle = "You have added one Role Model Successfully";

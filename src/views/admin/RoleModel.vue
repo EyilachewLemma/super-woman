@@ -208,7 +208,7 @@ export default {
       this.$store.commit("setIsItemLoading", true);
       try {
         var response = await apiClient.get(
-          `api/role_models?lang=${search.lang}&page=${search.page}&search=${search.searchBy}&filter=${search.filterBy}&per_page=${search.per_page}`
+          `api/role_models?lang=${search.lang}&page=${search.page}&filter=${search.filterBy}&per_page=${search.per_page}`
         );
         if (response.status === 200) {
           this.roleModels = response.data;
@@ -237,10 +237,18 @@ export default {
         return "Unverified";
       }
     },
-    searchRoleModel() {
-      this.search.lang = this.lang
-      this.fetchRoleModels(this.search);
-      //  this.resultsFound = this.roleModels.data?.length+' Results'
+   async searchRoleModel() {
+          this.$store.commit("setIsItemLoading", true);
+      try {
+        var response = await apiClient.get(`api/search_role_models?search=${this.search.searchBy}`);
+        if (response.status === 200) {
+          this.roleModels = response.data;
+          this.resultsFound = this.roleModels.data?.length + " Results";
+          this.sortingRoleModels = response.data.data;
+        }
+      } finally {
+        this.$store.commit("setIsItemLoading", false);
+      }
     },
     filterRoleModel(event) {
       this.search.filterBy = event.target.value;

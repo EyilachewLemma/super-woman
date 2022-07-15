@@ -6,10 +6,9 @@
  <base-button title="Save" :isLoading="isLoading" @baseButton="saveBlogPost()"></base-button>
 
   </div>
-      <div>
-      <!-- <div>Select Language</div> -->
+      <!-- <div>
      <language-selector></language-selector>
-    </div>
+    </div> -->
 </div>
 <base-card>
 <div class="formContainer">
@@ -149,7 +148,7 @@ export default {
         console.log('blog content ====',this.blogDetail)
     }
        try {
-            var response = await fileApiClient.post(`api/blogs?lang=${this.lang}`,formData)
+            var response = await fileApiClient.post(`api/blogs?lang=${'en'}`,formData)
             if(response.status === 201){
                this.isSucceessfull = true
               this.modalTitle = 'You have added one Blog Successfully'

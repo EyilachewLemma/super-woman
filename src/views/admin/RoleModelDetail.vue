@@ -6,7 +6,7 @@
     <div>
       <strong>{{ roleModelDetails.title }}</strong>
     </div>
-    <div class="d-flex">
+    <div class="d-flex align-self-start">
       <base-button
         v-if="roleModelDetails.is_verified === 0"
         title="Verify"
@@ -198,7 +198,9 @@ export default {
         var response = await apiClient.get(`api/role_models/${this.roleModelId}?lang=${this.lang}`)
         if (response.status === 200) {
           this.roleModelDetails = response.data;
+          if(this.roleModelDetails.images?.length){
           this.slicedImages = this.roleModelDetails.images.slice(1);
+          }
           console.log("rolemodel detail =", response.data);
         }
       } finally {
